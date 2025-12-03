@@ -1,0 +1,265 @@
+@import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400;500;600;700&display=swap");
+
+html,
+body,
+#root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Unbounded", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+body {
+    background-color: #000;
+}
+
+.register-page {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.register-page__bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("../../assets/auth-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.register-page__content {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 40px 24px 0 50px;
+    box-sizing: border-box;
+}
+
+/* карточка-телефон */
+
+.register-card {
+    width: min(550px, 80vw);
+    max-width: 92vw;
+    height: 88vh;
+    transform: translateY(140px);
+
+    background: rgba(217, 217, 217, 0); /* 70% прозрачности */
+    border-radius: 40px;
+    padding: 84px 60px 48px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.register-card__header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.register-card__title {
+    margin: 0;
+    margin-left: 65px;
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #350707;
+    font-weight: 600;
+}
+
+.register-card__subtitle {
+    margin: 0;
+    margin-left: 65px;
+    font-size: 20px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #000000;
+    font-weight: 200;
+    white-space: nowrap;
+}
+
+/* выбор роли */
+
+.role-toggle {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    margin-left: 65px;
+}
+
+.role-toggle__btn {
+    flex: 1;
+    height: 86px;
+    width: 207px;
+    border-radius: 20px;
+    border: 1px solid #4c1111;
+    background: transparent;
+    color: #4c1111;
+    font-size: 20px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: background 0.1s ease, color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.role-toggle__btn--active {
+    background: #4c1111;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* форма */
+
+.register-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    margin-left: 65px;
+    align-items: center;
+}
+
+.register-field {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.register-field__input {
+    width: 100%;
+    height: 62px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    padding: 0 36px;
+    font-size: 20px;
+    background: #bfbfbf;
+    color: #2a2a2a;
+    font-weight: 300;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.register-field__input::placeholder {
+    color: #5b5b5b;
+    font-weight: 300;
+    font-size: 20px;
+}
+
+.register-field__input:focus {
+    box-shadow: 0 0 0 2px rgba(139, 0, 24, 0.6);
+}
+
+.register-error {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #b00020;
+    font-weight: 300;
+    text-align: center;
+}
+
+/* кнопка SIGN UP */
+
+.register-form__submit {
+    margin-top: 32px;
+    width: 80%;
+    height: 66px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    background: #4c1111;
+    color: #ffffff;
+    font-size: 24px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 400;
+    cursor: pointer;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.45);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+}
+
+.register-form__submit:hover {
+    background: #651717;
+    transform: translateY(-1px);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.55);
+}
+
+.register-form__submit:active {
+    transform: translateY(0);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* низ */
+
+.register-card__bottom {
+    margin: 0;
+    margin-left: 65px;
+    margin-top: -35px;
+    font-size: 18px;
+    text-align: center;
+    font-weight: 300;
+    color: #ffffff;
+}
+
+.register-card__bottom-text {
+    font-weight: 300;
+}
+
+.register-card__bottom-link {
+    font-weight: 300;
+    color: #772424;
+    text-decoration: none;
+}
+
+.register-card__bottom-link:hover {
+    text-decoration: underline;
+}
+
+/* адаптив */
+
+@media (max-width: 960px) {
+    .register-page__content {
+        justify-content: center;
+        padding: 40px 16px 0;
+    }
+
+    .register-card {
+        width: 100%;
+        height: auto;
+        transform: none;
+        min-height: 560px;
+        padding: 60px 32px 40px;
+    }
+
+    .register-form {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .role-toggle {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .register-card__title,
+    .register-card__subtitle {
+        margin-left: 0;
+    }
+
+    .register-form__submit {
+        width: 70%;
+    }
+
+    .register-card__bottom {
+        margin-left: 0;
+        font-size: 16px;
+    }
+}
