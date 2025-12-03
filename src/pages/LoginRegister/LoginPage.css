@@ -79,6 +79,7 @@ body {
 
 .login-card__title {
     margin: 0;
+    margin-left: 65px;
     font-size: 64px;        /* крупный */
     line-height: 1;
     letter-spacing: 0.09em;
@@ -89,6 +90,7 @@ body {
 
 .login-card__subtitle {
     margin: 0px;
+    margin-left: 65px;
     font-size: 20px;        /* больше */
     letter-spacing: 0.09em;
     text-transform: uppercase;
@@ -106,6 +108,7 @@ body {
     gap: 26px;
     margin-top: 40px;     /* опускаем форму ниже */
     margin-bottom: 40px;
+    margin-left: 65px;
     align-items: center;
 }
 
@@ -175,6 +178,7 @@ body {
 
 .login-card__bottom {
     margin: 0;
+    margin-left: 65px;
     margin-top: -37px;        /* было 20px — ближе к кнопке */
     font-size: 18px;        /* было 26px — делаем меньше */
     text-align: center;
