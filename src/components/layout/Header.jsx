@@ -1,0 +1,144 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FaComments } from "react-icons/fa";
+import logoSkull from "../../assets/logo-skull.png";
+import "../../pages/HomePage/HomePage.css";
+
+const Header = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("th_user");
+        if (storedUser) {
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (e) {
+                console.error("Cannot parse user from localStorage", e);
+            }
+        }
+    }, []);
+
+    const isAuthenticated = !!user;
+    const isCompany = user?.role === "COMPANY";
+    const isEmployee = user?.role === "EMPLOYEE";
+
+    const getAvatarLetter = () =>
+        user?.fullName?.[0]?.toUpperCase() ||
+        user?.email?.[0]?.toUpperCase() ||
+        "U";
+
+    const isActive = (path) => location.pathname === path;
+
+    const go = (path) => () => navigate(path);
+
+    const goAddVacancy = () => navigate("/company/vacancies/new");
+    const goCompanyVacancies = () => navigate("/company/vacancies");
+    const goAllEmployees = () => navigate("/company/employees");
+    const goVacancies = () => navigate("/vacancies");
+    const goResponses = () => navigate("/employee/responses");
+    const goChat = () => navigate("/chat");
+    const goProfile = () => navigate("/profile");
+
+    return (
+        <header className="th-header">
+            <div className="th-header-left" onClick={go("/")}>
+                <img
+                    src={logoSkull}
+                    alt="Tattoo Hunter logo"
+                    className="th-logo-img"
+                />
+                <span className="th-logo-text">Tattoo Hunter</span>
+            </div>
+
+            <nav className="th-nav-center">
+                <button
+                    className={
+                        "th-nav-link " + (isActive("/") ? "th-nav-link-active" : "")
+                    }
+                    onClick={go("/")}
+                >
+                    Home
+                </button>
+                <button
+                    className={
+                        "th-nav-link " + (isActive("/about") ? "th-nav-link-active" : "")
+                    }
+                    onClick={go("/about")}
+                >
+                    About Us
+                </button>
+                <button
+                    className={
+                        "th-nav-link " + (isActive("/contact") ? "th-nav-link-active" : "")
+                    }
+                    onClick={go("/contact")}
+                >
+                    Contact Us
+                </button>
+
+                {isCompany && (
+                    <>
+                        <button className="th-nav-link" onClick={goAddVacancy}>
+                            Add Vacancy
+                        </button>
+                        <button className="th-nav-link" onClick={goCompanyVacancies}>
+                            Your Vacancies
+                        </button>
+                        <button className="th-nav-link" onClick={goAllEmployees}>
+                            All Workers
+                        </button>
+                    </>
+                )}
+
+                {isEmployee && (
+                    <>
+                        <button className="th-nav-link" onClick={goVacancies}>
+                            Vacancies
+                        </button>
+                        <button className="th-nav-link" onClick={goResponses}>
+                            Responses
+                        </button>
+                    </>
+                )}
+            </nav>
+
+            <div className="th-header-right">
+                {isAuthenticated ? (
+                    <>
+                        <button className="th-chat-btn" onClick={goChat}>
+                            <FaComments />
+                            <span>Chat</span>
+                        </button>
+                        <button className="th-avatar" onClick={goProfile}>
+                            {user?.avatarUrl ? (
+                                <img src={user.avatarUrl} alt="avatar" />
+                            ) : (
+                                <span>{getAvatarLetter()}</span>
+                            )}
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            className="th-nav-link th-login-btn"
+                            onClick={go("/login")}
+                        >
+                            Login
+                        </button>
+                        <button
+                            className="th-primary-btn"
+                            onClick={go("/register")}
+                        >
+                            Register
+                        </button>
+                    </>
+                )}
+            </div>
+        </header>
+    );
+};
+
+export default Header;

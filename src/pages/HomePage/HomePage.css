@@ -1,0 +1,677 @@
+:root {
+    --th-bg: #050509;
+    --th-bg-hero: #050509;
+    --th-primary: #00c6ff;
+    --th-primary-dark: #0091c0;
+    --th-text-main: #ffffff;
+    --th-text-muted: #c6c6c6;
+}
+
+.th-page {
+    min-height: 100vh;
+    background-color: var(--th-bg);
+    color: var(--th-text-main);
+    font-family: "Figtree", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+/* HEADER */
+
+.th-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 18px 64px;
+
+    display: flex;
+    align-items: center;
+    /* важно: не центрируем flex, даём жить лево+право как есть */
+    justify-content: space-between;
+}
+
+
+.th-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.th-logo-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.th-logo-text {
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.th-nav-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);  /* идеально по центру шапки */
+
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+
+.th-nav-link {
+    background: none;
+    border: none;
+    color: var(--th-text-main);
+    opacity: 0.9;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.th-nav-link:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.th-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.th-login-btn {
+    font-weight: 600;
+}
+
+.th-primary-btn {
+    background: var(--th-primary);
+    border: none;
+    color: #001018;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.th-primary-btn:hover {
+    background: var(--th-primary-dark);
+    transform: translateY(-1px);
+}
+
+.th-chat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 198, 255, 0.08);
+    border-radius: 999px;
+    border: 1px solid rgba(0, 198, 255, 0.5);
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--th-text-main);
+}
+
+.th-chat-btn svg {
+    font-size: 14px;
+}
+
+.th-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 2px solid var(--th-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0b0b10;
+    color: var(--th-text-main);
+    font-weight: 700;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.th-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* HERO */
+
+.th-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.th-hero {
+    position: relative;
+    min-height: 100vh;
+    background-image: url("../../assets/hero-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 140px 64px 80px;
+}
+
+.th-hero-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;                /* расстояние между текстом и иконками */
+    transform: translateY(-40px);  /* двигаем блок чуть выше центра */
+}
+
+
+.th-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.35),
+            rgba(0, 0, 0, 0.7)
+    );
+    mix-blend-mode: multiply;
+}
+
+.th-hero-content {
+    position: relative;
+    width: min(1100px, 100% - 80px);  /* широкая плашка по макету */
+    text-align: center;
+    padding: 0 40px;                  /* вертикальных паддингов не нужно */
+    border-radius: 0;
+    background: transparent;          /* убрали тёмный фон */
+    margin: 0 auto;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.65); /* чтобы текст читался на фоне */
+}
+
+
+
+.th-hero-title {
+    font-size: 52px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.th-hero-subtitle {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--th-text-muted);
+}
+
+/* COUNTERS */
+
+.th-counters {
+    position: static;          /* больше не absolute */
+    transform: none;
+    margin-top: 8px;           /* небольшой отступ от текста */
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+
+.th-counter-bubble {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--th-text-main);
+}
+
+.th-counter-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    background: var(--th-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.th-counter-icon svg {
+    font-size: 28px;
+    color: #001018;
+}
+
+.th-counter-number {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.th-counter-label {
+    font-size: 14px;
+    color: var(--th-text-muted);
+}
+
+/* BOTTOM SECTION */
+
+.th-bottom-section {
+    padding: 80px 64px 60px;
+    background: #050509;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+}
+
+.th-about-block {
+    max-width: 420px;
+}
+
+.th-about-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.th-about-text {
+    font-size: 14px;
+    color: var(--th-text-muted);
+}
+
+.th-socials {
+    display: flex;
+    gap: 32px;
+    font-size: 26px;
+}
+
+.th-socials a {
+    color: var(--th-text-main);
+    opacity: 0.8;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.th-socials a:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+/* ADAPTIVE */
+
+@media (max-width: 1024px) {
+    .th-header {
+        padding: 16px 24px;
+    }
+
+    .th-hero {
+        padding: 120px 24px 80px;
+    }
+
+    .th-hero-title {
+        font-size: 38px;
+    }
+
+    .th-bottom-section {
+        padding: 60px 24px 40px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .th-header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .th-nav-center {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .th-hero-title {
+        font-size: 30px;
+    }
+
+    .th-hero-content {
+        padding: 18px 20px;
+    }
+
+    .th-counters {
+        position: static;
+        transform: none;
+        margin-top: 24px;
+        padding-bottom: 16px;
+    }
+
+    .th-bottom-section {
+        gap: 32px;
+    }
+
+    .th-footer {
+        padding: 32px 24px 20px;
+    }
+}
+
+/* ---------- STATIC PAGES (ABOUT / CONTACT) ---------- */
+
+.th-static-page {
+    position: relative;
+    min-height: 100vh;
+    padding: 140px 64px 80px;
+
+    background-image:
+            linear-gradient(
+                    to bottom,
+                    rgba(0, 0, 0, 0.5),
+                    rgba(0, 0, 0, 0.85)
+            ),
+            url("../../assets/hero-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+
+.th-static-inner {
+    max-width: 960px;
+    width: 100%;
+}
+
+.th-static-title {
+    font-size: 40px;
+    font-weight: 800; /* Figtree bold */
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.th-static-subtitle {
+    font-size: 16px;
+    font-weight: 500; /* medium */
+    color: var(--th-text-muted);
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 32px;
+}
+
+.th-static-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.th-static-card {
+    position: relative;
+    border-radius: 14px;
+    padding: 18px 18px 20px;
+
+    /* изначально прямоугольник почти невидимый */
+    background: transparent;
+    border: 1px solid transparent;
+
+    transition:
+            background 0.35s ease,
+            border-color 0.35s ease,
+            box-shadow 0.35s ease,
+            transform 0.2s ease;
+}
+
+/* текст всегда виден */
+.th-static-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.th-static-card p {
+    font-size: 14px;
+    color: var(--th-text-muted);
+}
+
+/* при наведении прямоугольник проявляется */
+.th-static-card:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(0, 198, 255, 0.16);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+}
+
+
+.th-static-block {
+    margin-bottom: 24px;
+}
+
+.th-static-block h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.th-static-block p {
+    font-size: 14px;
+    color: var(--th-text-muted);
+}
+
+.th-static-list {
+    list-style: disc;
+    padding-left: 20px;
+    font-size: 14px;
+    color: var(--th-text-muted);
+}
+
+.th-values-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); /* текст + картинка справа */
+    gap: 24px;
+    align-items: stretch;
+    margin-top: 8px;
+}
+
+.th-values-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.th-values-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.th-values-image img {
+    width: 100%;
+    max-width: 320px;
+    border-radius: 18px;       /* чуть скруглённые углы */
+    object-fit: cover;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+}
+
+/* CONTACT layout */
+
+.th-static-inner--contact {
+    max-width: 1000px;
+}
+
+.th-contact-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+    gap: 32px;
+    margin-top: 16px;
+}
+
+.th-contact-info h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.th-contact-info p {
+    font-size: 14px;
+    color: var(--th-text-muted);
+    margin-bottom: 16px;
+}
+
+.th-contact-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.th-contact-label {
+    font-size: 13px;
+    color: #8f8f98;
+}
+
+.th-contact-value {
+    font-size: 14px;
+    color: var(--th-text-main);
+    transition: color 0.25s ease;
+}
+
+.th-contact-value:hover {
+    color: #40C7DF;
+}
+
+.th-contact-form {
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 16px;
+    padding: 20px 20px 22px;
+    border: 1px solid rgba(0, 198, 255, 0.16);
+}
+
+.th-form-row {
+    margin-bottom: 12px;
+}
+
+.th-form-row label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.th-form-row input,
+.th-form-row select,
+.th-form-row textarea {
+    background: #050509;
+    border-radius: 10px;
+    border: 1px solid #272735;
+    padding: 8px 10px;
+    color: var(--th-text-main);
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.th-form-row input:focus,
+.th-form-row select:focus,
+.th-form-row textarea:focus {
+    outline: none;
+    border-color: var(--th-primary);
+}
+
+.th-contact-submit {
+    margin-top: 6px;
+}
+
+.th-nav-link-active {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* Миссия + Ценности + фото справа */
+
+.th-mission-values {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
+    gap: 32px;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.th-mission-values-left {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* делаем текст под миссией и ценностями чуть крупнее */
+.th-static-text-lg {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* чтобы h2 опять чуть выделялись */
+.th-static-block h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* фотка справа — побольше и с мягкими углами */
+.th-mission-values-image {
+    display: flex;
+    justify-content: center;
+}
+
+.th-mission-values-image img {
+    width: 100%;
+    max-width: 460px;          /* фотка больше */
+    border-radius: 20px;       /* слегка закруглённые углы */
+    object-fit: cover;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+}
+
+
+/* адаптив для about/contact */
+
+@media (max-width: 1024px) {
+    .th-static-page {
+        padding: 120px 24px 60px;
+    }
+
+    .th-static-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .th-contact-layout {
+        grid-template-columns: 1fr;
+    }
+    .th-values-section {
+        grid-template-columns: 1fr;
+    }
+
+    .th-values-image {
+        justify-content: flex-start;
+    }
+
+    .th-values-image img {
+        max-width: 100%;
+    }
+}
+@media (max-width: 1024px) {
+    .th-mission-values {
+        grid-template-columns: 1fr;
+    }
+
+    .th-mission-values-image {
+        justify-content: flex-start;
+    }
+
+    .th-mission-values-image img {
+        max-width: 100%;
+    }
+}
