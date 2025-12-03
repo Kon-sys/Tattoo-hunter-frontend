@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import Header from "../../components/layout/Header";
+import { parseJwt } from "../../api/jwt";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -38,6 +39,23 @@ const LoginPage = () => {
             const data = await res.json();
             console.log("Auth response:", data);
 
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("refreshToken", data.refreshToken);
+
+// Декодируем payload
+            const payload = parseJwt(data.token);
+
+// Создаем user
+            const thUser = {
+                login: payload.sub,
+                role: payload.role,     // ROLE_EMPLOYEE / ROLE_COMPANY
+                fullName: payload.sub,  // временно, пока нет настоящего имени
+                email: payload.sub,
+            };
+
+// Сохраняем в localStorage
+            localStorage.setItem("th_user", JSON.stringify(thUser));
+
             /**
              * ОЧЕНЬ ВАЖНО:
              * Тут я предполагаю, что контроллер возвращает JSON вида:
@@ -50,11 +68,6 @@ const LoginPage = () => {
              *
              * Если поля называются иначе — просто поправь ключи ниже.
              */
-
-            localStorage.setItem("token", data.token);
-            if (data.refreshToken) {
-                localStorage.setItem("refreshToken", data.refreshToken);
-            }
 
             setLoading(false);
 

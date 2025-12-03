@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaComments } from "react-icons/fa";
 import logoSkull from "../../assets/logo-skull.png";
 import "../../pages/HomePage/HomePage.css";
+import { apiFetch } from "../../api/apiClient";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Header = () => {
 
     const [user, setUser] = useState(null);
 
+    // 1. Читаем th_user из localStorage
     useEffect(() => {
         const storedUser = localStorage.getItem("th_user");
         if (storedUser) {
@@ -21,9 +23,56 @@ const Header = () => {
         }
     }, []);
 
+    // 2. Если это EMPLOYEE — подтягиваем mainPhoto из /api/profile/employee/me
+    useEffect(() => {
+        const loadEmployeeAvatar = async () => {
+            if (!user || user.role !== "ROLE_EMPLOYEE") return;
+
+            try {
+                const res = await apiFetch("/api/profile/employee/me", {
+                    method: "GET",
+                });
+
+                if (!res.ok) {
+                    console.log("Cannot load employee profile:", res.status);
+                    return;
+                }
+
+                const data = await res.json();
+
+                // обновляем user, добавляя avatarUrl
+                setUser((prev) =>
+                    prev
+                        ? {
+                            ...prev,
+                            avatarUrl: data.mainPhoto || prev.avatarUrl || null,
+                            fullName:
+                                prev.fullName ||
+                                data.firstName ||
+                                data.lastName
+                                    ? `${data.firstName || ""} ${data.lastName || ""}`.trim()
+                                    : prev.fullName,
+                        }
+                        : prev
+                );
+
+                // синхронизируем обратно в localStorage, чтобы не терялось при перезагрузке
+                const updated = {
+                    ...(user || {}),
+                    avatarUrl: data.mainPhoto || user?.avatarUrl || null,
+                };
+                localStorage.setItem("th_user", JSON.stringify(updated));
+            } catch (e) {
+                console.error("Error loading employee profile", e);
+            }
+        };
+
+        loadEmployeeAvatar();
+    }, [user?.role]); // реагируем, когда появилась ROLE_EMPLOYEE
+
     const isAuthenticated = !!user;
-    const isCompany = user?.role === "COMPANY";
-    const isEmployee = user?.role === "EMPLOYEE";
+    const isCompany = user?.role === "ROLE_COMPANY";
+    const isEmployee = user?.role === "ROLE_EMPLOYEE";
 
     const getAvatarLetter = () =>
         user?.fullName?.[0]?.toUpperCase() ||
@@ -41,6 +90,14 @@ const Header = () => {
     const goResponses = () => navigate("/employee/responses");
     const goChat = () => navigate("/chat");
     const goProfile = () => navigate("/profile");
+
+    const logout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("th_user");
+        setUser(null);
+        navigate("/login");
+    };
 
     return (
         <header className="th-header">
@@ -72,7 +129,8 @@ const Header = () => {
                 </button>
                 <button
                     className={
-                        "th-nav-link " + (isActive("/contact") ? "th-nav-link-active" : "")
+                        "th-nav-link " +
+                        (isActive("/contact") ? "th-nav-link-active" : "")
                     }
                     onClick={go("/contact")}
                 >
@@ -112,12 +170,17 @@ const Header = () => {
                             <FaComments />
                             <span>Chat</span>
                         </button>
+
                         <button className="th-avatar" onClick={goProfile}>
                             {user?.avatarUrl ? (
                                 <img src={user.avatarUrl} alt="avatar" />
                             ) : (
                                 <span>{getAvatarLetter()}</span>
                             )}
+                        </button>
+
+                        <button className="th-nav-link th-logout-btn" onClick={logout}>
+                            Logout
                         </button>
                     </>
                 ) : (

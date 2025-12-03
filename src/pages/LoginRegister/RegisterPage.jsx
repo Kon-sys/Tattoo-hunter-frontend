@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./RegisterPage.css";
 import Header from "../../components/layout/Header";
+import { parseJwt } from "../../api/jwt";
+
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -38,6 +40,15 @@ const RegisterPage = () => {
                 } else if (text && text.includes("Заполните все поля")) {
                     setError("Заполните все поля");
                 }
+                else if (text && text.includes("Login cannot be empty")) {
+                    setError("Логин не может быть пустым");
+                }
+                else if (text && text.includes("Password cannot be empty")) {
+                    setError("Пароль не может быть пустым");
+                }
+                else if (text && text.includes("Choose your role")) {
+                    setError("Выберите роль");
+                }
                 else {
                     setError("Ошибка при регистрации");
                 }
@@ -57,14 +68,29 @@ const RegisterPage = () => {
                 localStorage.setItem("refreshToken", data.refreshToken);
             }
 
+            const payload = parseJwt(data.token);
+
+            const thUser = {
+                login: payload.sub,
+                role: payload.role,
+                fullName: payload.sub,
+                email: payload.sub,
+            };
+
+            localStorage.setItem("th_user", JSON.stringify(thUser));
+
+
             setLoading(false);
 
             // редирект на страницу дополнительной информации в зависимости от роли
             if (role === "ROLE_COMPANY") {
-                navigate("/profile/company");   // здесь сделаешь форму, которая дергает /api/profile/company
+                navigate("/profile/company");
             } else {
-                navigate("/profile/employee");  // а здесь форму под /api/profile/employee
+                // запустить пошаговый wizard
+                navigate("/profile/employee/basic?flow=register");
             }
+
+
         } catch (err) {
             console.error(err);
             setError("Ошибка подключения к серверу");

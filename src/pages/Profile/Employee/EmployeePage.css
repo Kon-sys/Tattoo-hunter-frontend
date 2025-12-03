@@ -1,0 +1,284 @@
+/* ШРИФТ */
+@import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400;500;600;700&display=swap");
+
+html, body, #root {
+    margin: 0;
+    padding: 0;
+    font-family: "Unbounded", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+.emp-page {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto; /* вместо overflow: hidden; */
+}
+
+.emp-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("../../../assets/auth-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.emp-content {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 40px 24px 0 50px;
+    box-sizing: border-box;
+}
+
+/* КАРТОЧКА-ТЕЛЕФОН */
+.emp-card {
+    width: min(550px, 80vw);
+    height: 88vh;
+    transform: translateY(140px);
+
+    /* Полностью прозрачная */
+    background: rgba(217, 217, 217, 0);
+    border-radius: 40px;
+    padding: 60px 60px 40px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* Заголовки */
+.emp-title {
+    margin: 0 0 20px 0;
+    font-size: 32px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #350707;
+    font-weight: 600;
+}
+
+/* Формы */
+.emp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.emp-row {
+    display: flex;
+    gap: 16px;
+}
+
+.emp-input {
+    flex: 1;
+    height: 62px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    padding: 0 26px;
+    font-size: 18px;
+    background: #bfbfbf;
+    color: #2a2a2a;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.emp-input::placeholder { color: #5b5b5b; }
+
+/* Кнопка */
+.emp-btn {
+    margin-top: 20px;
+    width: 80%;
+    height: 66px;
+    align-self: center;
+
+    border: none;
+    border-radius: 25px;
+    background: #4c1111;
+    color: #fff;
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+
+    box-shadow: 0 5px 10px rgba(0,0,0,0.45);
+    transition: .1s;
+}
+
+.emp-btn:hover {
+    background: #651717;
+    transform: translateY(-2px);
+}
+
+.emp-error {
+    color: #ffb3b3;
+    font-size: 14px;
+}
+
+/* Категории */
+.emp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.emp-tile {
+    padding: 16px 12px;
+    text-align: center;
+    border-radius: 16px;
+    border: 1px solid #4c1111;
+    background: rgba(255,255,255,0.1);
+    color: #eee;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+
+    transition: .15s;
+}
+
+.emp-tile--active {
+    background: #4c1111;
+    border-color: #4c1111;
+    color: white;
+}
+
+/* Текстовое поле */
+.emp-textarea {
+    height: 140px;
+    resize: vertical;
+    padding-top: 16px;
+}
+
+.emp-input--file {
+    padding: 18px 20px;
+    height: auto;
+    cursor: pointer;
+    background: rgba(191, 191, 191, 0.9);
+}
+.emp-input--file::file-selector-button {
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    margin-right: 12px;
+    background: #4c1111;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+/* ===== PROFILE VIEW ===== */
+
+.emp-card--profile {
+    padding-top: 40px;
+}
+
+.emp-profile-header {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.emp-profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 36px;
+    font-weight: 500;
+}
+
+.emp-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.emp-profile-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.emp-profile-text {
+    color: #ffffff;
+    font-size: 14px;
+    margin: 0 0 4px 0;
+}
+
+.emp-profile-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.emp-profile-block {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 20px;
+    padding: 16px 20px;
+}
+
+.emp-profile-subtitle {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.emp-profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 24px;
+}
+
+.emp-label {
+    font-size: 12px;
+    color: #aaaaaa;
+    margin-bottom: 2px;
+}
+
+.emp-value {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.emp-link {
+    color: #ffcccc;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+.emp-btn--small {
+    width: auto;
+    padding: 0 24px;
+    height: 44px;
+    font-size: 16px;
+}
+
+/* ===== EDIT MENU ===== */
+
+.emp-edit-grid {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.emp-btn--full {
+    width: 100%;
+    height: 54px;
+    font-size: 18px;
+}
+
