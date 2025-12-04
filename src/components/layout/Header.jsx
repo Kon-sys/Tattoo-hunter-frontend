@@ -48,10 +48,9 @@ const Header = () => {
                             avatarUrl: data.mainPhoto || prev.avatarUrl || null,
                             fullName:
                                 prev.fullName ||
-                                data.firstName ||
-                                data.lastName
+                                (data.firstName || data.lastName
                                     ? `${data.firstName || ""} ${data.lastName || ""}`.trim()
-                                    : prev.fullName,
+                                    : prev.fullName),
                         }
                         : prev
                 );
@@ -85,11 +84,13 @@ const Header = () => {
 
     const goAddVacancy = () => navigate("/company/vacancies/new");
     const goCompanyVacancies = () => navigate("/vacancies");
-    const goAllEmployees = () => navigate("/company/employees");
     const goVacancies = () => navigate("/vacancies");
-    const goResponses = () => navigate("/employee/responses");
-    const goChat = () => navigate("/chat");
+    const goResponses = () => navigate("/responses");
+    const goChat = () => navigate("/chats");
     const goProfile = () => navigate("/profile");
+
+    // 🔥 ДОБАВЛЕНО: отдельная навигация для откликов компании
+    const goCompanyResponses = () => navigate("/company/responses");
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -121,7 +122,8 @@ const Header = () => {
                 </button>
                 <button
                     className={
-                        "th-nav-link " + (isActive("/about") ? "th-nav-link-active" : "")
+                        "th-nav-link " +
+                        (isActive("/about") ? "th-nav-link-active" : "")
                     }
                     onClick={go("/about")}
                 >
@@ -145,8 +147,9 @@ const Header = () => {
                         <button className="th-nav-link" onClick={goCompanyVacancies}>
                             Your Vacancies
                         </button>
-                        <button className="th-nav-link" onClick={goAllEmployees}>
-                            All Workers
+                        {/* 🔥 ДОБАВЛЕНО: Responses для компании */}
+                        <button className="th-nav-link" onClick={goCompanyResponses}>
+                            Responses
                         </button>
                     </>
                 )}

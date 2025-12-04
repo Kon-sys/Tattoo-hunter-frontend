@@ -7,7 +7,7 @@ import { apiFetch } from "../../api/apiClient";
 
 const busyOptions = [
     { value: "FULL_EMPLOYMENT", label: "Полная занятость" },
-    { value: "PART_TIME", label: "Частичная занятость" },
+    { value: "PRIVATE_EMPLOYMENT", label: "Частичная занятость" },
 ];
 
 const workScheduleOptions = [

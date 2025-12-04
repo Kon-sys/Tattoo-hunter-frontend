@@ -86,7 +86,7 @@ const CompanyVacancyPhoto = () => {
 
             // редирект, куда тебе удобнее:
             // например, на список вакансий компании
-            navigate("/company/vacancies");
+            navigate("/vacancies");
         } catch (err) {
             console.error(err);
             setError("Ошибка подключения к серверу");

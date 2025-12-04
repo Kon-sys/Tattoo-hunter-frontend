@@ -1,3 +1,4 @@
+// src/pages/Vacancy/VacancyDetailsPage.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Header from "../../components/layout/Header";
@@ -11,6 +12,8 @@ const VacancyDetailsPage = () => {
     const [vacancy, setVacancy] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [alreadyResponded, setAlreadyResponded] = useState(false);
+    const [respondLoading, setRespondLoading] = useState(false);
 
     let user = null;
     try {
@@ -21,35 +24,21 @@ const VacancyDetailsPage = () => {
     }
 
     const role = user?.role;
+    const login = user?.login;
 
+    // 1. грузим вакансию
     useEffect(() => {
         let cancelled = false;
 
         const load = async () => {
             try {
-                let path;
-                let options = { method: "GET" };
-
-                if (role === "ROLE_COMPANY") {
-                    // компания смотрит свою вакансию через vacancy-service
-                    path = `/api/vacancy/${id}`;
-                    options.headers = {
-                        "X_User_Login": user?.login,
-                        "X_User_Role": role,
-                    };
-                } else {
-                    // работник / гость — через listingvacanciesservice
-                    path = `/api/vacancies/${id}`;
-                    // headers оставляем пустыми, apiFetch сам добавит Authorization
-                }
-
-                const res = await apiFetch(path, options);
-
+                const res = await apiFetch(`/api/vacancies/${id}`, {
+                    method: "GET",
+                });
                 if (!res.ok) {
                     const text = await res.text();
                     throw new Error(text || "Ошибка загрузки вакансии");
                 }
-
                 const data = await res.json();
                 if (!cancelled) setVacancy(data);
             } catch (err) {
@@ -64,10 +53,97 @@ const VacancyDetailsPage = () => {
         return () => {
             cancelled = true;
         };
-    }, [id, role, user?.login]);
+    }, [id]);
 
-    const handleRespond = () => {
-        alert("Функция отклика будет реализована позже 😊");
+    // 2. проверяем, откликался ли уже работник на эту вакансию
+    useEffect(() => {
+        let cancelled = false;
+
+        const checkResponse = async () => {
+            if (!user || role !== "ROLE_EMPLOYEE") return;
+            try {
+                const res = await apiFetch("/api/responses/employee", {
+                    method: "GET",
+                    headers: {
+                        "X-User-Login": login, // ← важно: этот заголовок ждёт applications-service
+                    },
+                });
+                if (!res.ok) {
+                    // молча игнорируем, просто не будем скрывать кнопку
+                    return;
+                }
+                const list = await res.json();
+                const vacId = Number(id);
+
+                const has = Array.isArray(list) && list.some((r) => {
+                    // r.vacancyId, r.status из ResponseApplicationDto
+                    if (r.vacancyId !== vacId) return false;
+                    // считаем "уже откликнулся", если отклик не отклонён
+                    return r.status === "PENDING" || r.status === "APPROVED";
+                });
+
+                if (!cancelled) {
+                    setAlreadyResponded(has);
+                }
+            } catch (e) {
+                console.error("checkResponse error", e);
+            }
+        };
+
+        checkResponse();
+        return () => {
+            cancelled = true;
+        };
+    }, [id, role, login, user]);
+
+    const handleRespond = async () => {
+        if (alreadyResponded) return;
+
+        if (!user || role !== "ROLE_EMPLOYEE") {
+            alert("Только работник может откликнуться на вакансию");
+            return;
+        }
+
+        if (!vacancy) {
+            alert("Вакансия ещё не загружена");
+            return;
+        }
+
+        try {
+            setRespondLoading(true);
+            setError("");
+
+            // предполагаем, что vacancy содержит companyId (иначе добавь его в DTO на бэке)
+            const body = {
+                vacancyId: vacancy.id,
+                companyId: vacancy.companyId,
+            };
+
+            const res = await apiFetch("/api/responses", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-User-Login": login,
+                },
+                body: JSON.stringify(body),
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                console.error("respond error:", text);
+                setError("Не удалось отправить отклик");
+                return;
+            }
+
+            // если всё ок – считаем, что уже откликнулся
+            setAlreadyResponded(true);
+            alert("Отклик успешно отправлен!");
+        } catch (e) {
+            console.error(e);
+            setError("Ошибка при отправке отклика");
+        } finally {
+            setRespondLoading(false);
+        }
     };
 
     if (loading) {
@@ -85,7 +161,7 @@ const VacancyDetailsPage = () => {
         );
     }
 
-    if (error || !vacancy) {
+    if (error && !vacancy) {
         return (
             <div className="emp-page">
                 <div className="emp-bg" />
@@ -105,6 +181,10 @@ const VacancyDetailsPage = () => {
         );
     }
 
+    if (!vacancy) {
+        return null;
+    }
+
     const canEdit = role === "ROLE_COMPANY";
 
     return (
@@ -115,6 +195,12 @@ const VacancyDetailsPage = () => {
             <div className="emp-content">
                 <section className="emp-card emp-card--profile">
                     <h1 className="emp-title">VACANCY</h1>
+
+                    {error && (
+                        <p className="emp-error" style={{ marginBottom: "8px" }}>
+                            {error}
+                        </p>
+                    )}
 
                     <div className="emp-profile-header">
                         <div className="emp-profile-avatar">
@@ -199,15 +285,24 @@ const VacancyDetailsPage = () => {
                             </div>
                         )}
 
-                        {/* Отклик для работника */}
+                        {/* Блок с откликом для работника */}
                         {role === "ROLE_EMPLOYEE" && (
-                            <button
-                                type="button"
-                                className="emp-btn emp-btn--small"
-                                onClick={handleRespond}
-                            >
-                                Откликнуться
-                            </button>
+                            <>
+                                {alreadyResponded ? (
+                                    <p className="emp-profile-text">
+                                        Вы уже откликнулись на эту вакансию.
+                                    </p>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className="emp-btn emp-btn--small"
+                                        onClick={handleRespond}
+                                        disabled={respondLoading}
+                                    >
+                                        {respondLoading ? "Отправка..." : "Откликнуться"}
+                                    </button>
+                                )}
+                            </>
                         )}
 
                         {/* 3 плитки редактирования для компании */}

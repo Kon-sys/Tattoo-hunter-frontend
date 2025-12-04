@@ -7,10 +7,6 @@ import {
     FaBriefcase,
     FaUsers,
     FaBuilding,
-    FaGithub,
-    FaDiscord,
-    FaInstagram,
-    FaComments,
 } from "react-icons/fa";
 import "./HomePage.css";
 import logoSkull from "../../assets/logo-skull.png"; // ← твой логотип

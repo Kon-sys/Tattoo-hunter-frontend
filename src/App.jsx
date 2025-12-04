@@ -23,8 +23,10 @@ import VacancyDetailsPage from "./pages/Vacancy/VacancyDetailsPage";
 import CompanyVacancyEditBasic from "./pages/Vacancy/CompanyVacancyEditBasic";
 import CompanyVacancyEditAdditional from "./pages/Vacancy/CompanyVacancyEditAdditional";
 import CompanyVacancyEditPhoto from "./pages/Vacancy/CompanyVacancyEditPhoto";
-
-
+import EmployeeResponsesPage from "./pages/Responses/EmployeeResponsesPage";
+import CompanyResponsesPage from "./pages/Responses/CompanyResponsesPage";
+import ChatListPage from "./pages/Chat/ChatListPage";
+import ChatPage from "./pages/Chat/ChatPage";
 
 const App = () => {
     return (
@@ -34,13 +36,6 @@ const App = () => {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-
-            {/* заглушки для будущих роутов */}
-            <Route path="/company/vacancies" element={<div>Your vacancies</div>} />
-            <Route path="/company/employees" element={<div>All workers</div>} />
-
-            <Route path="/employee/responses" element={<div>Your responses</div>} />
-            <Route path="/chat" element={<div>Chat page</div>} />
 
             <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/profile/employee/basic" element={<EmployeeBasic />} />
@@ -80,6 +75,12 @@ const App = () => {
                 path="/company/vacancies/:id/edit/photo"
                 element={<CompanyVacancyEditPhoto />}
             />
+
+            <Route path="/responses" element={<EmployeeResponsesPage />} />
+            <Route path="/company/responses" element={<CompanyResponsesPage />} />
+
+            <Route path="/chats" element={<ChatListPage />} />
+            <Route path="/chats/:chatId" element={<ChatPage />} />
         </Routes>
     );
 };

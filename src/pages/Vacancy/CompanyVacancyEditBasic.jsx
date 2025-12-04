@@ -7,7 +7,7 @@ import { apiFetch } from "../../api/apiClient";
 
 const busyOptions = [
     { value: "FULL_EMPLOYMENT", label: "Полная занятость" },
-    { value: "PART_TIME", label: "Частичная занятость" },
+    { value: "PRIVATE_EMPLOYMENT", label: "Частичная занятость" },
 ];
 
 const workScheduleOptions = [
@@ -148,17 +148,20 @@ const CompanyVacancyEditBasic = () => {
                     "X_User_Login": login,
                     "X_User_Role": role,
                 },
-                body: formData,
+                body: formData, // title, incomeLevel, busy, experience, workSchedule, workingHours, workType
             });
 
             if (!res.ok) {
-                let message = "Ошибка обновления вакансии";
+                // 🔥 вот тут вытаскиваем всё, что есть
+                let message = `Ошибка обновления вакансии (status ${res.status})`;
                 try {
-                    const data = await res.json();
-                    if (data.message) message = data.message;
-                } catch {
-                    const t = await res.text();
-                    if (t) message = t;
+                    const text = await res.text();
+                    console.log("Update vacancy error raw response:", text);
+                    if (text) {
+                        message = text; // пусть даже это HTML/JSON — главное, увидим
+                    }
+                } catch (e) {
+                    console.error("Failed to read error body", e);
                 }
                 throw new Error(message);
             }
@@ -166,12 +169,13 @@ const CompanyVacancyEditBasic = () => {
             await res.json();
             navigate(`/vacancies/${id}`);
         } catch (err) {
-            console.error(err);
+            console.error("Update vacancy failed:", err);
             setError(err.message || "Не удалось сохранить изменения");
         } finally {
             setSaving(false);
         }
     };
+
 
     if (loading) {
         return (

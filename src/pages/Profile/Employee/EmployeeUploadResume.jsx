@@ -58,7 +58,7 @@ const EmployeeUploadResume = () => {
             setLoading(false);
             if (isRegisterFlow) {
                 // продолжаем воронку регистрации
-                navigate("/profile/employee/pload-photo?flow=register");
+                navigate("/profile/employee/upload-photo?flow=register");
             } else {
                 // редактирование из профиля → назад в профиль
                 navigate("/profile");
