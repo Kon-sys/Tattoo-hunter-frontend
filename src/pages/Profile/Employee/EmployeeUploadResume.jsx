@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../../../components/layout/Header";
 import "./EmployeePage.css";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const EmployeeUploadResume = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // режим: регистрация или редактирование
+    const params = new URLSearchParams(location.search);
+    const isRegisterFlow = params.get("flow") === "register";
 
     const [file, setFile] = useState(null);
     const [error, setError] = useState("");
@@ -51,7 +56,13 @@ const EmployeeUploadResume = () => {
 
             // резюме успешно загружено → идём на шаг с фото
             setLoading(false);
-            navigate("/profile/employee/upload-photo");
+            if (isRegisterFlow) {
+                // продолжаем воронку регистрации
+                navigate("/profile/employee/pload-photo?flow=register");
+            } else {
+                // редактирование из профиля → назад в профиль
+                navigate("/profile");
+            }
         } catch (e) {
             console.error(e);
             setError("Ошибка подключения к серверу");

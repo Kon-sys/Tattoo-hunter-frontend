@@ -14,6 +14,17 @@ import EmployeeUploadResume from "./pages/Profile/Employee/EmployeeUploadResume"
 import EmployeeUploadPhoto from "./pages/Profile/Employee/EmployeeUploadPhoto";
 import EmployeeProfilePage from "./pages/Profile/Employee/EmployeeProfilePage";
 import EmployeeProfileEdit from "./pages/Profile/Employee/EmployeeProfileEdit";
+import CompanyProfilePage from "./pages/Profile/Company/CompanyProfilePage";
+import CompanyVacancyNewBasic from "./pages/Vacancy/CompanyVacancyNewBasic";
+import CompanyVacancyAdditional from "./pages/Vacancy/CompanyVacancyAdditional";
+import CompanyVacancyPhoto from "./pages/Vacancy/CompanyVacancyPhoto";
+import VacancyListPage from "./pages/Vacancy/VacancyListPage";
+import VacancyDetailsPage from "./pages/Vacancy/VacancyDetailsPage";
+import CompanyVacancyEditBasic from "./pages/Vacancy/CompanyVacancyEditBasic";
+import CompanyVacancyEditAdditional from "./pages/Vacancy/CompanyVacancyEditAdditional";
+import CompanyVacancyEditPhoto from "./pages/Vacancy/CompanyVacancyEditPhoto";
+
+
 
 const App = () => {
     return (
@@ -23,13 +34,14 @@ const App = () => {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+
             {/* заглушки для будущих роутов */}
-            <Route path="/company/vacancies/new" element={<div>New vacancy</div>} />
             <Route path="/company/vacancies" element={<div>Your vacancies</div>} />
             <Route path="/company/employees" element={<div>All workers</div>} />
-            <Route path="/vacancies" element={<div>Vacancies list</div>} />
+
             <Route path="/employee/responses" element={<div>Your responses</div>} />
             <Route path="/chat" element={<div>Chat page</div>} />
+
             <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/profile/employee/basic" element={<EmployeeBasic />} />
                 <Route path="/profile/employee/categories" element={<EmployeeCategories />} />
@@ -44,6 +56,29 @@ const App = () => {
             <Route
                 path="/profile/employee/edit"
                 element={<EmployeeProfileEdit />}
+            />
+            <Route path="/profile/company" element={<CompanyProfilePage />} />
+
+            {/* список и просмотр вакансий — через listing-service */}
+            <Route path="/vacancies" element={<VacancyListPage />} />
+            <Route path="/vacancies/:id" element={<VacancyDetailsPage />} />
+
+            {/* создание вакансии — через vacancy-service */}
+            <Route path="/company/vacancies/new" element={<CompanyVacancyNewBasic />} />
+            <Route path="/company/vacancies/new/additional" element={<CompanyVacancyAdditional />} />
+            <Route path="/company/vacancies/new/photo" element={<CompanyVacancyPhoto />} />
+
+            <Route
+                path="/company/vacancies/:id/edit/basic"
+                element={<CompanyVacancyEditBasic />}
+            />
+            <Route
+                path="/company/vacancies/:id/edit/additional"
+                element={<CompanyVacancyEditAdditional />}
+            />
+            <Route
+                path="/company/vacancies/:id/edit/photo"
+                element={<CompanyVacancyEditPhoto />}
             />
         </Routes>
     );

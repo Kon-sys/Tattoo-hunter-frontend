@@ -2,13 +2,18 @@ import React, { useState } from "react";
 import "./EmployeePage.css";
 import Header from "../../../components/layout/Header";
 import { WORK_CATEGORIES } from "../../../constants/workCategories";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { apiFetch } from "../../../api/apiClient";
 
 const API = "http://localhost:8080/api/profile/employee/set-work-categories";
 
 const EmployeeCategories = () => {
     const nav = useNavigate();
+    const location = useLocation();
+
+    // режим: регистрация или редактирование
+    const params = new URLSearchParams(location.search);
+    const isRegisterFlow = params.get("flow") === "register";
 
     const [selected, setSelected] = useState([]);
     const [error, setError] = useState("");
@@ -50,7 +55,14 @@ const EmployeeCategories = () => {
                 return;
             }
 
-            nav("/profile/employee/contacts");
+            if (isRegisterFlow) {
+                // продолжаем воронку регистрации
+                nav("/profile/employee/contacts?flow=register");
+            } else {
+                // редактирование из профиля → назад в профиль
+                nav("/profile");
+            }
+
         } catch (e) {
             console.error(e);
             setError("Ошибка подключения к серверу");

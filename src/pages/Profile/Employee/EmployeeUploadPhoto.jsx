@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../../../components/layout/Header";
 import "./EmployeePage.css";
 
 const EmployeeUploadPhoto = () => {
-    const navigate = useNavigate();
+    const nav = useNavigate();
+    const location = useLocation();
+
+    // режим: регистрация или редактирование
+    const params = new URLSearchParams(location.search);
+    const isRegisterFlow = params.get("flow") === "register";
 
     const [file, setFile] = useState(null);
     const [error, setError] = useState("");
@@ -62,7 +67,13 @@ const EmployeeUploadPhoto = () => {
 
             // всё ок
             setLoading(false);
-            navigate("/"); // или куда тебе нужно дальше
+            if (isRegisterFlow) {
+                // продолжаем воронку регистрации
+                nav("/");
+            } else {
+                // редактирование из профиля → назад в профиль
+                nav("/profile");
+            }
         } catch (e) {
             console.error(e);
             setError("Ошибка подключения к серверу");

@@ -1,5 +1,6 @@
 import React from "react";
 import EmployeeProfilePage from "./Employee/EmployeeProfilePage";
+import CompanyProfilePage from "./Company/CompanyProfilePage";
 import Header from "../../components/layout/Header";
 import "../Profile/Employee/EmployeePage.css";
 
@@ -18,13 +19,17 @@ const ProfilePage = () => {
         return <EmployeeProfilePage />;
     }
 
-    // заглушка для компании / админа
+    if (role === "ROLE_COMPANY") {
+        return <CompanyProfilePage />;
+    }
+
+    // заглушка для админа / неавторизованных / неизвестных ролей
     return (
         <div className="emp-page">
             <div className="emp-bg" />
             <Header />
             <div className="emp-content">
-                <section className="emp-card">
+                <section className="emp-card emp-card--profile">
                     <h1 className="emp-title">PROFILE</h1>
                     <p className="emp-profile-text">
                         Профиль для этой роли пока не реализован.

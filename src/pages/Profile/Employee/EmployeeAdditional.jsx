@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import "./EmployeePage.css";
 import Header from "../../../components/layout/Header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const API = "http://localhost:8080/api/profile/employee/additional-info";
 
 const EmployeeAdditional = () => {
     const nav = useNavigate();
+    const location = useLocation();
+
+    // режим: регистрация или редактирование
+    const params = new URLSearchParams(location.search);
+    const isRegisterFlow = params.get("flow") === "register";
 
     const [addInfo, setAddInfo] = useState("");
     const [error, setError] = useState("");
@@ -30,8 +35,13 @@ const EmployeeAdditional = () => {
             setError("Ошибка сохранения");
             return;
         }
-
-        nav("/profile/employee/upload-resume");
+        if (isRegisterFlow) {
+            // продолжаем воронку регистрации
+            nav("/profile/employee/upload-resume?flow=register");
+        } else {
+            // редактирование из профиля → назад в профиль
+            nav("/profile");
+        }
     };
 
     return (

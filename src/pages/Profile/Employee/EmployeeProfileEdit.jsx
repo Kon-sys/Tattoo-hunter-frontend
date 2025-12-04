@@ -53,7 +53,7 @@ const EmployeeProfileEdit = () => {
                         <button
                             className="emp-btn emp-btn--full"
                             onClick={() =>
-                                navigate("/profile/employee/resume")
+                                navigate("/profile/employee/upload-resume")
                             }
                         >
                             Upload resume
@@ -61,7 +61,7 @@ const EmployeeProfileEdit = () => {
                         <button
                             className="emp-btn emp-btn--full"
                             onClick={() =>
-                                navigate("/profile/employee/photo")
+                                navigate("/profile/employee/upload-photo")
                             }
                         >
                             Upload photo

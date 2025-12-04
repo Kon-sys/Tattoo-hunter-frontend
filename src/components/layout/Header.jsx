@@ -84,7 +84,7 @@ const Header = () => {
     const go = (path) => () => navigate(path);
 
     const goAddVacancy = () => navigate("/company/vacancies/new");
-    const goCompanyVacancies = () => navigate("/company/vacancies");
+    const goCompanyVacancies = () => navigate("/vacancies");
     const goAllEmployees = () => navigate("/company/employees");
     const goVacancies = () => navigate("/vacancies");
     const goResponses = () => navigate("/employee/responses");

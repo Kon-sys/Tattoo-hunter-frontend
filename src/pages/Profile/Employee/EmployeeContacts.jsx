@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import Header from "../../../components/layout/Header";
 import "./EmployeePage.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { apiFetch } from "../../../api/apiClient";
 
 const API = "http://localhost:8080/api/profile/employee/contact-details";
 
 const EmployeeContacts = () => {
     const nav = useNavigate();
+    const location = useLocation();
+
+    // режим: регистрация или редактирование
+    const params = new URLSearchParams(location.search);
+    const isRegisterFlow = params.get("flow") === "register";
 
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
@@ -40,7 +46,13 @@ const EmployeeContacts = () => {
             return;
         }
 
-        nav("/profile/employee/additional");
+        if (isRegisterFlow) {
+            // продолжаем воронку регистрации
+            nav("/profile/employee/additional?flow=register");
+        } else {
+            // редактирование из профиля → назад в профиль
+            nav("/profile");
+        }
     };
 
     return (
