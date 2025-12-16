@@ -27,6 +27,7 @@ import EmployeeResponsesPage from "./pages/Responses/EmployeeResponsesPage";
 import CompanyResponsesPage from "./pages/Responses/CompanyResponsesPage";
 import ChatListPage from "./pages/Chat/ChatListPage";
 import ChatPage from "./pages/Chat/ChatPage";
+import AdminAnalyticsPage from "./pages/Admin/AdminAnalyticsPage";
 
 const App = () => {
     return (
@@ -81,6 +82,7 @@ const App = () => {
 
             <Route path="/chats" element={<ChatListPage />} />
             <Route path="/chats/:chatId" element={<ChatPage />} />
+            <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
         </Routes>
     );
 };

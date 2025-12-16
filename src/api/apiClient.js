@@ -88,3 +88,19 @@ export async function apiFetch(path, options = {}, retry = true) {
 
     return res;
 }
+
+export async function apiGetJson(path, options = {}, retry = true) {
+    const res = await apiFetch(path, options, retry);
+
+    if (!res.ok) {
+        let text = "";
+        try {
+            text = await res.text();
+        } catch (e) {
+            // ignore
+        }
+        throw new Error(text || `Request failed with status ${res.status}`);
+    }
+
+    return res.json();
+}
