@@ -2,6 +2,7 @@ import React from "react";
 import EmployeeProfilePage from "./Employee/EmployeeProfilePage";
 import CompanyProfilePage from "./Company/CompanyProfilePage";
 import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
 import "../Profile/Employee/EmployeePage.css";
 
 const ProfilePage = () => {
@@ -36,6 +37,7 @@ const ProfilePage = () => {
                     </p>
                 </section>
             </div>
+            <Footer />
         </div>
     );
 };

@@ -45,10 +45,11 @@ const App = () => {
                 <Route path="/profile/employee/additional" element={<EmployeeAdditional />} />
                 <Route path="/profile/employee/upload-resume" element={<EmployeeUploadResume />} />
                 <Route path="/profile/employee/upload-photo" element={<EmployeeUploadPhoto />} />
-            <Route
-                path="/profile/employee/view"
-                element={<EmployeeProfilePage />}
-            />
+
+            <Route path="/profile/company/view/:login" element={<EmployeeProfilePage />} />
+            <Route path="/profile/employee/view/:id" element={<CompanyProfilePage />} />
+
+
             <Route
                 path="/profile/employee/edit"
                 element={<EmployeeProfileEdit />}

@@ -1,74 +1,70 @@
-import React, { useState } from "react";
-import Header from "../../../components/layout/Header";
-import "./EmployeePage.css";
-import { useNavigate, useLocation } from "react-router-dom";
+"use client"
+
+import React, { useState } from "react"
+import Header from "../../../components/layout/Header"
+import Footer from "../../../components/layout/Footer";
+import "./EmployeePage.css"
+import { useNavigate, useLocation } from "react-router-dom"
 
 const EmployeeUploadResume = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
+    const navigate = useNavigate()
+    const location = useLocation()
 
-    // режим: регистрация или редактирование
-    const params = new URLSearchParams(location.search);
-    const isRegisterFlow = params.get("flow") === "register";
+    const params = new URLSearchParams(location.search)
+    const isRegisterFlow = params.get("flow") === "register"
 
-    const [file, setFile] = useState(null);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [file, setFile] = useState(null)
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const onFileChange = (e) => {
-        setFile(e.target.files[0] || null);
-        setError("");
-    };
+        setFile(e.target.files[0] || null)
+        setError("")
+    }
 
     const onSubmit = async () => {
         if (!file) {
-            setError("Пожалуйста, выберите файл резюме");
-            return;
+            setError("Пожалуйста, выберите файл резюме")
+            return
         }
 
-        setLoading(true);
-        setError("");
+        setLoading(true)
+        setError("")
 
         try {
-            const token = localStorage.getItem("token");
-            const formData = new FormData();
-            formData.append("file", file);
+            const token = localStorage.getItem("token")
+            const formData = new FormData()
+            formData.append("file", file)
 
-            const res = await fetch(
-                "http://localhost:8080/api/profile/employee/set-resume",
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`, // ВАЖНО: без Content-Type
-                    },
-                    body: formData,
-                }
-            );
+            const res = await fetch("http://localhost:8080/api/profile/employee/set-resume", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            })
 
-            const text = await res.text();
-            console.log("set-resume:", res.status, text);
+            const text = await res.text()
+            console.log("set-resume:", res.status, text)
 
             if (!res.ok) {
-                setError(text || "Ошибка загрузки резюме");
-                setLoading(false);
-                return;
+                setError(text || "Ошибка загрузки резюме")
+                setLoading(false)
+                return
             }
 
-            // резюме успешно загружено → идём на шаг с фото
-            setLoading(false);
+            setLoading(false)
             if (isRegisterFlow) {
-                // продолжаем воронку регистрации
-                navigate("/profile/employee/upload-photo?flow=register");
+                navigate("/profile/employee/upload-photo?flow=register")
             } else {
-                // редактирование из профиля → назад в профиль
-                navigate("/profile");
+                navigate("/profile")
             }
         } catch (e) {
-            console.error(e);
-            setError("Ошибка подключения к серверу");
-            setLoading(false);
+            console.error(e)
+            setError("Ошибка подключения к серверу")
+            setLoading(false)
         }
-    };
+    }
 
     return (
         <div className="emp-page">
@@ -80,9 +76,7 @@ const EmployeeUploadResume = () => {
                     <h1 className="emp-title">UPLOAD RESUME</h1>
 
                     <div className="emp-form">
-                        <p style={{ color: "#fff", fontSize: 14, marginBottom: 8 }}>
-                            Загрузите PDF или другой файл с резюме.
-                        </p>
+                        <p style={{ color: "#fff", fontSize: 14, marginBottom: 8 }}>Загрузите PDF или другой файл с резюме.</p>
 
                         <input
                             type="file"
@@ -91,11 +85,7 @@ const EmployeeUploadResume = () => {
                             onChange={onFileChange}
                         />
 
-                        {file && (
-                            <p style={{ color: "#fff", fontSize: 12, marginTop: 6 }}>
-                                Выбран файл: {file.name}
-                            </p>
-                        )}
+                        {file && <p style={{ color: "#fff", fontSize: 12, marginTop: 6 }}>Выбран файл: {file.name}</p>}
 
                         {error && (
                             <div className="emp-error" style={{ marginTop: 8 }}>
@@ -103,18 +93,15 @@ const EmployeeUploadResume = () => {
                             </div>
                         )}
 
-                        <button
-                            className="emp-btn"
-                            onClick={onSubmit}
-                            disabled={loading}
-                        >
+                        <button className="emp-btn" onClick={onSubmit} disabled={loading}>
                             {loading ? "Uploading..." : "Continue"}
                         </button>
                     </div>
                 </section>
             </div>
+            <Footer />
         </div>
-    );
-};
+    )
+}
 
-export default EmployeeUploadResume;
+export default EmployeeUploadResume

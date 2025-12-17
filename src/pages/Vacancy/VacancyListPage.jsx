@@ -1,358 +1,299 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Header from "../../components/layout/Header";
-import "../Profile/Employee/EmployeePage.css";
-import { apiFetch } from "../../api/apiClient";
+"use client"
+
+import React, { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
+import Header from "../../components/layout/Header"
+import Footer from "../../components/layout/Footer.jsx"
+import "./VacancyList.css"
+import { apiFetch } from "../../api/apiClient"
 
 const VacancyListPage = () => {
-    const [vacancies, setVacancies] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [vacancies, setVacancies] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
 
-    // --- состояние для поиска и фильтров (для работника) ---
-    const [searchTitle, setSearchTitle] = useState("");
-    const [income, setIncome] = useState("");
-    const [busy, setBusy] = useState("");
-    const [workSchedule, setWorkSchedule] = useState("");
-    const [workType, setWorkType] = useState("");
-    const [minExperience, setMinExperience] = useState("");
-    const [maxExperience, setMaxExperience] = useState("");
-    const [minWorkingHours, setMinWorkingHours] = useState("");
-    const [maxWorkingHours, setMaxWorkingHours] = useState("");
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompanyIds, setSelectedCompanyIds] = useState([]);
+    const [filtersVisible, setFiltersVisible] = useState(false)
+    const [companiesDropdownOpen, setCompaniesDropdownOpen] = useState(false)
 
-    let user = null;
+    const [searchTitle, setSearchTitle] = useState("")
+    const [income, setIncome] = useState("")
+    const [busy, setBusy] = useState("")
+    const [workSchedule, setWorkSchedule] = useState("")
+    const [workType, setWorkType] = useState("")
+    const [minExperience, setMinExperience] = useState("")
+    const [maxExperience, setMaxExperience] = useState("")
+    const [minWorkingHours, setMinWorkingHours] = useState("")
+    const [maxWorkingHours, setMaxWorkingHours] = useState("")
+    const [companies, setCompanies] = useState([])
+    const [selectedCompanyIds, setSelectedCompanyIds] = useState([])
+
+    let user = null
     try {
-        const stored = localStorage.getItem("th_user");
-        user = stored ? JSON.parse(stored) : null;
+        const stored = localStorage.getItem("th_user")
+        user = stored ? JSON.parse(stored) : null
     } catch (e) {
-        console.error("Cannot parse th_user", e);
+        console.error("Cannot parse th_user", e)
     }
 
-    const role = user?.role;
-    const login = user?.login;
+    const role = user?.role
+    const login = user?.login
 
-    // --- вспомогательная функция первичной загрузки списка ---
     const loadInitialVacancies = async (currentRole, currentLogin) => {
         try {
-            setLoading(true);
-            setError("");
+            setLoading(true)
+            setError("")
 
-            let res;
+            let res
             if (currentRole === "ROLE_COMPANY") {
-                // 🏢 компания — только свои вакансии через vacancy-service
                 res = await apiFetch("/api/vacancy/company", {
                     method: "GET",
                     headers: {
-                        "X_User_Login": currentLogin,
-                        "X_User_Role": currentRole,
+                        X_User_Login: currentLogin,
+                        X_User_Role: currentRole,
                     },
-                });
+                })
             } else {
-                // 👤 работник или гость — общий список через listing-vacancies-service
                 res = await apiFetch("/api/vacancies", {
                     method: "GET",
-                });
+                })
             }
 
             if (!res.ok) {
-                const text = await res.text();
-                throw new Error(text || "Ошибка загрузки вакансий");
+                const text = await res.text()
+                throw new Error(text || "Ошибка загрузки вакансий")
             }
 
-            const data = await res.json();
-            setVacancies(Array.isArray(data) ? data : []);
+            const data = await res.json()
+            setVacancies(Array.isArray(data) ? data : [])
         } catch (err) {
-            console.error(err);
-            setError("Не удалось загрузить вакансии");
+            console.error(err)
+            setError("Не удалось загрузить вакансии")
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
-    // --- загрузка вакансий при монтировании / смене роли ---
     useEffect(() => {
-        let cancelled = false;
+        let cancelled = false
 
         const load = async () => {
-            await loadInitialVacancies(role, login);
-        };
+            await loadInitialVacancies(role, login)
+        }
 
         if (!cancelled) {
-            load();
+            load()
         }
 
         return () => {
-            cancelled = true;
-        };
-    }, [role, login]);
+            cancelled = true
+        }
+    }, [role, login])
 
-    // --- загрузка списка компаний для фильтра (только для работника) ---
     useEffect(() => {
-        if (role !== "ROLE_EMPLOYEE") return;
+        if (role !== "ROLE_EMPLOYEE") return
 
-        let cancelled = false;
+        let cancelled = false
 
         const loadCompanies = async () => {
             try {
                 const res = await apiFetch("/api/vacancies/company", {
                     method: "GET",
                     headers: {
-                        "X_User_Role": role,
+                        X_User_Role: role,
                     },
-                });
+                })
 
                 if (!res.ok) {
-                    const text = await res.text();
-                    console.error("Ошибка загрузки компаний:", text);
-                    return;
+                    const text = await res.text()
+                    console.error("Ошибка загрузки компаний:", text)
+                    return
                 }
 
-                const data = await res.json();
+                const data = await res.json()
                 if (!cancelled) {
-                    setCompanies(Array.isArray(data) ? data : []);
+                    setCompanies(Array.isArray(data) ? data : [])
                 }
             } catch (err) {
-                console.error("Не удалось загрузить компании:", err);
+                console.error("Не удалось загрузить компании:", err)
             }
-        };
+        }
 
-        loadCompanies();
+        loadCompanies()
 
         return () => {
-            cancelled = true;
-        };
-    }, [role]);
+            cancelled = true
+        }
+    }, [role])
 
-    // --- переключение чекбоксов компаний ---
     const toggleCompany = (companyId) => {
         setSelectedCompanyIds((prev) =>
-            prev.includes(companyId)
-                ? prev.filter((id) => id !== companyId)
-                : [...prev, companyId]
-        );
-    };
+            prev.includes(companyId) ? prev.filter((id) => id !== companyId) : [...prev, companyId],
+        )
+    }
 
-    // --- обработчик поиска по названию (для работника) ---
     const handleSearch = async (e) => {
-        e.preventDefault();
-        if (role !== "ROLE_EMPLOYEE") return;
+        e.preventDefault()
+        if (role !== "ROLE_EMPLOYEE") return
 
         if (!searchTitle.trim()) {
-            // если пустой поиск — просто вернёмся к полному списку / фильтрам
-            await loadInitialVacancies(role, login);
-            return;
+            await loadInitialVacancies(role, login)
+            return
         }
 
         try {
-            setLoading(true);
-            setError("");
+            setLoading(true)
+            setError("")
 
-            const params = new URLSearchParams();
-            params.append("title", searchTitle.trim());
+            const params = new URLSearchParams()
+            params.append("title", searchTitle.trim())
 
             const res = await apiFetch(`/api/vacancies/search?${params.toString()}`, {
                 method: "GET",
                 headers: {
-                    "X_User_Role": role,
+                    X_User_Role: role,
                 },
-            });
+            })
 
             if (!res.ok) {
-                const text = await res.text();
-                throw new Error(text || "Ошибка поиска вакансий");
+                const text = await res.text()
+                throw new Error(text || "Ошибка поиска вакансий")
             }
 
-            const data = await res.json();
-            setVacancies(Array.isArray(data) ? data : []);
+            const data = await res.json()
+            setVacancies(Array.isArray(data) ? data : [])
         } catch (err) {
-            console.error(err);
-            setError("Не удалось выполнить поиск");
+            console.error(err)
+            setError("Не удалось выполнить поиск")
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
-    // --- обработчик применения фильтров (для работника) ---
     const handleApplyFilters = async (e) => {
-        e.preventDefault();
-        if (role !== "ROLE_EMPLOYEE") return;
+        e.preventDefault()
+        if (role !== "ROLE_EMPLOYEE") return
 
         try {
-            setLoading(true);
-            setError("");
+            setLoading(true)
+            setError("")
 
-            const params = new URLSearchParams();
+            const params = new URLSearchParams()
 
-            if (income.trim()) params.append("income", income.trim());
-            if (busy) params.append("busy", busy);
-            if (workSchedule) params.append("workSchedule", workSchedule);
-            if (workType) params.append("workType", workType);
+            if (income.trim()) params.append("income", income.trim())
+            if (busy) params.append("busy", busy)
+            if (workSchedule) params.append("workSchedule", workSchedule)
+            if (workType) params.append("workType", workType)
 
-            if (minExperience) params.append("minExperience", minExperience);
-            if (maxExperience) params.append("maxExperience", maxExperience);
-            if (minWorkingHours) params.append("minWorkingHours", minWorkingHours);
-            if (maxWorkingHours) params.append("maxWorkingHours", maxWorkingHours);
+            if (minExperience) params.append("minExperience", minExperience)
+            if (maxExperience) params.append("maxExperience", maxExperience)
+            if (minWorkingHours) params.append("minWorkingHours", minWorkingHours)
+            if (maxWorkingHours) params.append("maxWorkingHours", maxWorkingHours)
 
-            // несколько компаний
             selectedCompanyIds.forEach((id) => {
-                params.append("companyIds", id);
-            });
+                params.append("companyIds", id)
+            })
 
-            console.log("Selected companies:", selectedCompanyIds);
-            console.log("Filter query string:", params.toString());
+            console.log("Selected companies:", selectedCompanyIds)
+            console.log("Filter query string:", params.toString())
 
-            const qs = params.toString();
-            const url = qs ? `/api/vacancies/filter?${qs}` : "/api/vacancies";
+            const qs = params.toString()
+            const url = qs ? `/api/vacancies/filter?${qs}` : "/api/vacancies"
 
-            const options =
-                url.startsWith("/api/vacancies/filter")
-                    ? {
-                        method: "GET",
-                        headers: {
-                            "X_User_Role": role,
-                        },
-                    }
-                    : {
-                        method: "GET",
-                    };
+            const options = url.startsWith("/api/vacancies/filter")
+                ? {
+                    method: "GET",
+                    headers: {
+                        X_User_Role: role,
+                    },
+                }
+                : {
+                    method: "GET",
+                }
 
-            const res = await apiFetch(url, options);
+            const res = await apiFetch(url, options)
 
             if (!res.ok) {
-                const text = await res.text();
-                throw new Error(text || "Ошибка фильтрации вакансий");
+                const text = await res.text()
+                throw new Error(text || "Ошибка фильтрации вакансий")
             }
 
-            const data = await res.json();
-            setVacancies(Array.isArray(data) ? data : []);
+            const data = await res.json()
+            setVacancies(Array.isArray(data) ? data : [])
         } catch (err) {
-            console.error(err);
-            setError("Не удалось применить фильтры");
+            console.error(err)
+            setError("Не удалось применить фильтры")
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
-    // --- сброс фильтров ---
     const handleResetFilters = async () => {
-        setSearchTitle("");
-        setIncome("");
-        setBusy("");
-        setWorkSchedule("");
-        setWorkType("");
-        setMinExperience("");
-        setMaxExperience("");
-        setMinWorkingHours("");
-        setMaxWorkingHours("");
-        setSelectedCompanyIds([]);
-        await loadInitialVacancies(role, login);
-    };
+        setSearchTitle("")
+        setIncome("")
+        setBusy("")
+        setWorkSchedule("")
+        setWorkType("")
+        setMinExperience("")
+        setMaxExperience("")
+        setMinWorkingHours("")
+        setMaxWorkingHours("")
+        setSelectedCompanyIds([])
+        await loadInitialVacancies(role, login)
+    }
 
-    const titleText =
-        role === "ROLE_COMPANY" ? "Ваши вакансии" : "Вакансии";
+    const titleText = role === "ROLE_COMPANY" ? "Ваши вакансии" : "Вакансии"
+
+    const selectedCompaniesText =
+        selectedCompanyIds.length === 0
+            ? "Выберите компании"
+            : selectedCompanyIds.length === 1
+                ? companies.find((c) => c.id === selectedCompanyIds[0])?.name || "1 компания выбрана"
+                : `Выбрано: ${selectedCompanyIds.length}`
 
     return (
-        <div className="emp-page">
-            <div className="emp-bg" />
+        <div className="vacancy-page">
+            <div className="vacancy-bg" />
             <Header />
 
-            <div className="emp-content">
-                <section className="emp-card emp-card--profile">
-                    <h1 className="emp-title">{titleText}</h1>
+            <div className="vacancy-content">
+                <section className="vacancy-card">
+                    <h1 className="vacancy-title">{titleText}</h1>
 
-                    {/* Фильтры и поиск только для работника */}
                     {role === "ROLE_EMPLOYEE" && (
-                        <div
-                            className="emp-profile-block"
-                            style={{ marginBottom: "20px" }}
-                        >
-                            {/* Поиск по названию */}
-                            <form
-                                onSubmit={handleSearch}
-                                style={{
-                                    display: "flex",
-                                    gap: "12px",
-                                    marginBottom: "16px",
-                                    alignItems: "center",
-                                }}
+                        <>
+                            <button
+                                type="button"
+                                className={`filter-toggle-btn ${filtersVisible ? "open" : ""}`}
+                                onClick={() => setFiltersVisible(!filtersVisible)}
                             >
-                                <input
-                                    type="text"
-                                    className="emp-input"
-                                    placeholder="Поиск по названию вакансии..."
-                                    value={searchTitle}
-                                    onChange={(e) => setSearchTitle(e.target.value)}
-                                />
-                                <button
-                                    type="submit"
-                                    className="emp-btn emp-btn--small"
-                                    style={{ width: "auto", whiteSpace: "nowrap" }}
-                                >
-                                    Найти
-                                </button>
-                            </form>
+                                <span>{filtersVisible ? "Скрыть фильтры" : "Показать фильтры"}</span>
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 11L3 6h10l-5 5z" />
+                                </svg>
+                            </button>
 
-                            {/* Фильтры */}
-                            <form
-                                onSubmit={handleApplyFilters}
-                                className="emp-form"
-                                style={{ gap: "12px" }}
-                            >
-                                <div className="emp-row">
-                                    <input
-                                        type="text"
-                                        className="emp-input"
-                                        placeholder="Доход (строка, например: от 2000 BYN)"
-                                        value={income}
-                                        onChange={(e) => setIncome(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="emp-row">
-                                    <select
-                                        className="emp-input"
-                                        value={busy}
-                                        onChange={(e) => setBusy(e.target.value)}
-                                    >
+                            <div className={`filter-container ${!filtersVisible ? "collapsed" : ""}`}>
+                                <div className="filter-row filter-row--equal">
+                                    <select className="filter-select" value={busy} onChange={(e) => setBusy(e.target.value)}>
                                         <option value="">Занятость: любая</option>
-                                        {/* значения value должны совпадать с enum Busy */}
-                                        <option value="FULL_EMPLOYMENT">
-                                            Полная занятость
-                                        </option>
-                                        <option value="PRIVATE_EMPLOYMENT">
-                                            Частичная занятость
-                                        </option>
-                                        {/* при необходимости добавь остальные варианты */}
+                                        <option value="FULL_EMPLOYMENT">Полная занятость</option>
+                                        <option value="PRIVATE_EMPLOYMENT">Частичная занятость</option>
                                     </select>
 
                                     <select
-                                        className="emp-input"
+                                        className="filter-select"
                                         value={workSchedule}
                                         onChange={(e) => setWorkSchedule(e.target.value)}
                                     >
                                         <option value="">График: любой</option>
-                                        <option value="TWO_DAYS_ON_TWO_DAYS_OFF">
-                                            2/2
-                                        </option>
-                                        <option value="FIVE_DAYS_ON_TWO_DAYS_OFF">
-                                            5/2
-                                        </option>
-                                        <option value="SIX_DAYS_ON_ONE_DAY_OFF">
-                                            6/1
-                                        </option>
-                                        <option value="SHIFT_DAY_NIGHT">
-                                            Сменный (день/ночь)
-                                        </option>
+                                        <option value="TWO_DAYS_ON_TWO_DAYS_OFF">2/2</option>
+                                        <option value="FIVE_DAYS_ON_TWO_DAYS_OFF">5/2</option>
+                                        <option value="SIX_DAYS_ON_ONE_DAY_OFF">6/1</option>
+                                        <option value="SHIFT_DAY_NIGHT">Сменный (день/ночь)</option>
                                         <option value="FLEXIBLE">Гибкий</option>
                                     </select>
 
-                                    <select
-                                        className="emp-input"
-                                        value={workType}
-                                        onChange={(e) => setWorkType(e.target.value)}
-                                    >
+                                    <select className="filter-select" value={workType} onChange={(e) => setWorkType(e.target.value)}>
                                         <option value="">Формат: любой</option>
                                         <option value="AT_STUDIO">В студии</option>
                                         <option value="REMOTE">Удалённо</option>
@@ -360,178 +301,169 @@ const VacancyListPage = () => {
                                     </select>
                                 </div>
 
-                                <div className="emp-row">
+                                <div className="filter-row--split">
+                                    <input
+                                        type="text"
+                                        className="filter-input"
+                                        placeholder="Доход (например: от 2000 BYN)"
+                                        value={income}
+                                        onChange={(e) => setIncome(e.target.value)}
+                                    />
+
+                                    {companies.length > 0 && (
+                                        <div className="companies-dropdown">
+                                            <button
+                                                type="button"
+                                                className={`companies-dropdown-button ${companiesDropdownOpen ? "open" : ""}`}
+                                                onClick={() => setCompaniesDropdownOpen(!companiesDropdownOpen)}
+                                            >
+                                                <span>{selectedCompaniesText}</span>
+                                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M8 11L3 6h10l-5 5z" />
+                                                </svg>
+                                            </button>
+                                            {companiesDropdownOpen && (
+                                                <div className="companies-dropdown-menu">
+                                                    {companies.map((c) => (
+                                                        <div key={c.id} className="company-checkbox-item" onClick={() => toggleCompany(c.id)}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedCompanyIds.includes(c.id)}
+                                                                onChange={() => toggleCompany(c.id)}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                            <label onClick={(e) => e.stopPropagation()}>{c.name}</label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="filter-row">
                                     <input
                                         type="number"
-                                        className="emp-input"
+                                        className="filter-input"
                                         placeholder="Опыт, от (лет)"
                                         value={minExperience}
                                         onChange={(e) => setMinExperience(e.target.value)}
                                     />
                                     <input
                                         type="number"
-                                        className="emp-input"
+                                        className="filter-input"
                                         placeholder="Опыт, до (лет)"
                                         value={maxExperience}
                                         onChange={(e) => setMaxExperience(e.target.value)}
                                     />
                                 </div>
 
-                                <div className="emp-row">
+                                <div className="filter-row">
                                     <input
                                         type="number"
-                                        className="emp-input"
+                                        className="filter-input"
                                         placeholder="Часы в день, от"
                                         value={minWorkingHours}
-                                        onChange={(e) =>
-                                            setMinWorkingHours(e.target.value)
-                                        }
+                                        onChange={(e) => setMinWorkingHours(e.target.value)}
                                     />
                                     <input
                                         type="number"
-                                        className="emp-input"
+                                        className="filter-input"
                                         placeholder="Часы в день, до"
                                         value={maxWorkingHours}
-                                        onChange={(e) =>
-                                            setMaxWorkingHours(e.target.value)
-                                        }
+                                        onChange={(e) => setMaxWorkingHours(e.target.value)}
                                     />
                                 </div>
 
-                                {/* чекбоксы компаний */}
-                                {companies.length > 0 && (
-                                    <div>
-                                        <div className="emp-label">
-                                            Компании (выберите одну или несколько):
-                                        </div>
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexWrap: "wrap",
-                                                gap: "8px",
-                                                marginTop: "6px",
-                                            }}
-                                        >
-                                            {companies.map((c) => (
-                                                <label
-                                                    key={c.id}
-                                                    style={{
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: "6px",
-                                                        background:
-                                                            "rgba(0,0,0,0.35)",
-                                                        borderRadius: "12px",
-                                                        padding:
-                                                            "6px 10px 6px 10px",
-                                                    }}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedCompanyIds.includes(
-                                                            c.id
-                                                        )}
-                                                        onChange={() =>
-                                                            toggleCompany(c.id)
-                                                        }
-                                                    />
-                                                    <span className="emp-value">
-                                                        {c.name}
-                                                    </span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                                <form onSubmit={handleSearch} className="search-section">
+                                    <input
+                                        type="text"
+                                        className="search-input"
+                                        placeholder="Поиск по названию вакансии..."
+                                        value={searchTitle}
+                                        onChange={(e) => setSearchTitle(e.target.value)}
+                                    />
+                                    <button type="submit" className="btn btn-primary">
+                                        Найти
+                                    </button>
+                                </form>
 
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        gap: "12px",
-                                        marginTop: "10px",
-                                    }}
-                                >
-                                    <button
-                                        type="submit"
-                                        className="emp-btn emp-btn--small"
-                                        style={{ width: "auto" }}
-                                    >
+                                <div className="filter-actions">
+                                    <button type="button" className="btn btn-primary" onClick={handleApplyFilters}>
                                         Применить фильтры
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="emp-btn emp-btn--small"
-                                        style={{
-                                            width: "auto",
-                                            background: "rgba(0,0,0,0.4)",
-                                        }}
-                                        onClick={handleResetFilters}
-                                    >
+                                    <button type="button" className="btn btn-secondary" onClick={handleResetFilters}>
                                         Сбросить
                                     </button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </>
                     )}
 
-                    {loading && (
-                        <p className="emp-profile-text">Загрузка...</p>
-                    )}
-                    {error && <div className="emp-error">{error}</div>}
+                    {loading && <div className="loading">Загрузка...</div>}
+                    {error && <div className="error">{error}</div>}
 
-                    {!loading && !error && vacancies.length === 0 && (
-                        <p className="emp-profile-text">
-                            Вакансий пока нет.
-                        </p>
-                    )}
+                    {!loading && !error && vacancies.length === 0 && <div className="empty">Вакансии не найдены</div>}
 
-                    <div className="emp-profile-sections">
-                        {vacancies.map((v) => (
-                            <div
-                                key={v.id}
-                                className="emp-profile-block"
-                                style={{ marginBottom: "12px" }}
-                            >
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <div>
-                                        <div
-                                            className="emp-value"
-                                            style={{ fontSize: 16 }}
-                                        >
-                                            {v.title || "Без названия"}
-                                        </div>
-                                        {v.incomeLevel && (
-                                            <div className="emp-profile-text">
-                                                {v.incomeLevel}
+                    {!loading && !error && vacancies.length > 0 && (
+                        <div className="vacancy-list">
+                            {vacancies.map((v) => (
+                                <Link key={v.id} to={`/vacancies/${v.id}`} className="vacancy-item">
+                                    <h3 className="vacancy-item-title">{v.title}</h3>
+                                    <div className="vacancy-item-info">
+                                        {v.income && (
+                                            <div className="vacancy-item-row">
+                                                <span className="vacancy-item-label">Доход:</span>
+                                                <span className="vacancy-item-value">{v.income}</span>
                                             </div>
                                         )}
                                         {v.companyName && (
-                                            <div className="emp-profile-text">
-                                                Компания: {v.companyName}
+                                            <div className="vacancy-item-row">
+                                                <span className="vacancy-item-label">Компания:</span>
+                                                <span className="vacancy-item-value">{v.companyName}</span>
+                                            </div>
+                                        )}
+                                        {v.workType && (
+                                            <div className="vacancy-item-row">
+                                                <span className="vacancy-item-label">Формат:</span>
+                                                <span className="vacancy-item-value">{v.workType}</span>
+                                            </div>
+                                        )}
+                                        {v.busy && (
+                                            <div className="vacancy-item-row">
+                                                <span className="vacancy-item-label">Занятость:</span>
+                                                <span className="vacancy-item-value">{v.busy}</span>
+                                            </div>
+                                        )}
+                                        {v.workSchedule && (
+                                            <div className="vacancy-item-row">
+                                                <span className="vacancy-item-label">График:</span>
+                                                <span className="vacancy-item-value">{v.workSchedule}</span>
+                                            </div>
+                                        )}
+                                        {v.experience !== undefined && (
+                                            <div className="vacancy-item-row">
+                                                <span className="vacancy-item-label">Опыт:</span>
+                                                <span className="vacancy-item-value">{v.experience} лет</span>
+                                            </div>
+                                        )}
+                                        {v.workingHours !== undefined && (
+                                            <div className="vacancy-item-row">
+                                                <span className="vacancy-item-label">Часов/день:</span>
+                                                <span className="vacancy-item-value">{v.workingHours}</span>
                                             </div>
                                         )}
                                     </div>
-
-                                    <Link
-                                        to={`/vacancies/${v.id}`}
-                                        className="emp-link"
-                                    >
-                                        Смотреть
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                                    {v.description && <div className="vacancy-item-description">{v.description}</div>}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </section>
             </div>
+            <Footer />
         </div>
-    );
-};
+    )
+}
 
-export default VacancyListPage;
+export default VacancyListPage

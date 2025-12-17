@@ -1,10 +1,12 @@
+"use client"
+import { useNavigate } from "react-router-dom"
+import Header from "../../../components/layout/Header"
+import Footer from "../../../components/layout/Footer";
+import "./EmployeePage.css"
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "../../../components/layout/Header";
-import "./EmployeePage.css";
 
 const EmployeeProfileEdit = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
     return (
         <div className="emp-page">
@@ -15,62 +17,33 @@ const EmployeeProfileEdit = () => {
                 <section className="emp-card emp-card--profile">
                     <h1 className="emp-title">EDIT PROFILE</h1>
 
-                    <p className="emp-profile-text">
-                        Выберите раздел профиля, который хотите изменить.
-                    </p>
+                    <p className="emp-profile-text">Выберите раздел профиля, который хотите изменить.</p>
 
                     <div className="emp-edit-grid">
-                        <button
-                            className="emp-btn emp-btn--full"
-                            onClick={() => navigate("/profile/employee/basic")}
-                        >
+                        <button className="emp-btn emp-btn--full" onClick={() => navigate("/profile/employee/basic")}>
                             Basic info
                         </button>
-                        <button
-                            className="emp-btn emp-btn--full"
-                            onClick={() =>
-                                navigate("/profile/employee/categories")
-                            }
-                        >
+                        <button className="emp-btn emp-btn--full" onClick={() => navigate("/profile/employee/categories")}>
                             Work categories
                         </button>
-                        <button
-                            className="emp-btn emp-btn--full"
-                            onClick={() =>
-                                navigate("/profile/employee/contacts")
-                            }
-                        >
+                        <button className="emp-btn emp-btn--full" onClick={() => navigate("/profile/employee/contacts")}>
                             Contacts
                         </button>
-                        <button
-                            className="emp-btn emp-btn--full"
-                            onClick={() =>
-                                navigate("/profile/employee/additional")
-                            }
-                        >
+                        <button className="emp-btn emp-btn--full" onClick={() => navigate("/profile/employee/additional")}>
                             Additional info
                         </button>
-                        <button
-                            className="emp-btn emp-btn--full"
-                            onClick={() =>
-                                navigate("/profile/employee/upload-resume")
-                            }
-                        >
+                        <button className="emp-btn emp-btn--full" onClick={() => navigate("/profile/employee/upload-resume")}>
                             Upload resume
                         </button>
-                        <button
-                            className="emp-btn emp-btn--full"
-                            onClick={() =>
-                                navigate("/profile/employee/upload-photo")
-                            }
-                        >
+                        <button className="emp-btn emp-btn--full" onClick={() => navigate("/profile/employee/upload-photo")}>
                             Upload photo
                         </button>
                     </div>
                 </section>
             </div>
+            <Footer />
         </div>
-    );
-};
+    )
+}
 
-export default EmployeeProfileEdit;
+export default EmployeeProfileEdit

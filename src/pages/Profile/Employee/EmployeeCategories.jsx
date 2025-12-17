@@ -1,75 +1,60 @@
-import React, { useState } from "react";
-import "./EmployeePage.css";
-import Header from "../../../components/layout/Header";
-import { WORK_CATEGORIES } from "../../../constants/workCategories";
-import { useNavigate, useLocation } from "react-router-dom";
-import { apiFetch } from "../../../api/apiClient";
+"use client"
 
-const API = "http://localhost:8080/api/profile/employee/set-work-categories";
+import React, { useState } from "react"
+import "./EmployeePage.css"
+import Header from "../../../components/layout/Header"
+import Footer from "../../../components/layout/Footer";
+import { WORK_CATEGORIES } from "../../../constants/workCategories"
+import { useNavigate, useLocation } from "react-router-dom"
+import { apiFetch } from "../../../api/apiClient"
 
 const EmployeeCategories = () => {
-    const nav = useNavigate();
-    const location = useLocation();
+    const nav = useNavigate()
+    const location = useLocation()
 
-    // режим: регистрация или редактирование
-    const params = new URLSearchParams(location.search);
-    const isRegisterFlow = params.get("flow") === "register";
+    const params = new URLSearchParams(location.search)
+    const isRegisterFlow = params.get("flow") === "register"
 
-    const [selected, setSelected] = useState([]);
-    const [error, setError] = useState("");
+    const [selected, setSelected] = useState([])
+    const [error, setError] = useState("")
 
     const toggle = (cat) => {
-        setSelected((prev) =>
-            prev.includes(cat)
-                ? prev.filter((c) => c !== cat)
-                : [...prev, cat]
-        );
-    };
+        setSelected((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]))
+    }
 
     const save = async () => {
         if (selected.length === 0) {
-            setError("Выберите хотя бы одну категорию");
-            return;
+            setError("Выберите хотя бы одну категорию")
+            return
         }
 
-        const token = localStorage.getItem("token");
-
         try {
-            const res = await apiFetch(
-                "/api/profile/employee/set-work-categories",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ workCategories: selected }),
-                }
-            );
+            const res = await apiFetch("/api/profile/employee/set-work-categories", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ workCategories: selected }),
+            })
 
-
-            const text = await res.text();
-            console.log("set-work-categories:", res.status, text);
+            const text = await res.text()
+            console.log("set-work-categories:", res.status, text)
 
             if (!res.ok) {
-                setError(text || "Ошибка сохранения категорий");
-                return;
+                setError(text || "Ошибка сохранения категорий")
+                return
             }
 
             if (isRegisterFlow) {
-                // продолжаем воронку регистрации
-                nav("/profile/employee/contacts?flow=register");
+                nav("/profile/employee/contacts?flow=register")
             } else {
-                // редактирование из профиля → назад в профиль
-                nav("/profile");
+                nav("/profile")
             }
-
         } catch (e) {
-            console.error(e);
-            setError("Ошибка подключения к серверу");
+            console.error(e)
+            setError("Ошибка подключения к серверу")
         }
-    };
-
-
+    }
 
     return (
         <div className="emp-page">
@@ -84,12 +69,7 @@ const EmployeeCategories = () => {
                         {WORK_CATEGORIES.map((cat) => (
                             <div
                                 key={cat}
-                                className={
-                                    "emp-tile" +
-                                    (selected.includes(cat)
-                                        ? " emp-tile--active"
-                                        : "")
-                                }
+                                className={"emp-tile" + (selected.includes(cat) ? " emp-tile--active" : "")}
                                 onClick={() => toggle(cat)}
                             >
                                 {cat.replaceAll("_", " ")}
@@ -106,8 +86,9 @@ const EmployeeCategories = () => {
                     </div>
                 </section>
             </div>
+            <Footer />
         </div>
-    );
-};
+    )
+}
 
-export default EmployeeCategories;
+export default EmployeeCategories

@@ -72,6 +72,7 @@ const Header = () => {
     const isAuthenticated = !!user;
     const isCompany = user?.role === "ROLE_COMPANY";
     const isEmployee = user?.role === "ROLE_EMPLOYEE";
+    const isAdmin = user?.role === "ROLE_ADMIN"; // ✅ ДОБАВЛЕНО
 
     const getAvatarLetter = () =>
         user?.fullName?.[0]?.toUpperCase() ||
@@ -89,8 +90,11 @@ const Header = () => {
     const goChat = () => navigate("/chats");
     const goProfile = () => navigate("/profile");
 
-    // 🔥 ДОБАВЛЕНО: отдельная навигация для откликов компании
+    // 🔥 Responses для компании
     const goCompanyResponses = () => navigate("/company/responses");
+
+    // ✅ Analytics для админа
+    const goAnalytics = () => navigate("/admin/analytics");
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -113,27 +117,19 @@ const Header = () => {
 
             <nav className="th-nav-center">
                 <button
-                    className={
-                        "th-nav-link " + (isActive("/") ? "th-nav-link-active" : "")
-                    }
+                    className={"th-nav-link " + (isActive("/") ? "th-nav-link-active" : "")}
                     onClick={go("/")}
                 >
                     Home
                 </button>
                 <button
-                    className={
-                        "th-nav-link " +
-                        (isActive("/about") ? "th-nav-link-active" : "")
-                    }
+                    className={"th-nav-link " + (isActive("/about") ? "th-nav-link-active" : "")}
                     onClick={go("/about")}
                 >
                     About Us
                 </button>
                 <button
-                    className={
-                        "th-nav-link " +
-                        (isActive("/contact") ? "th-nav-link-active" : "")
-                    }
+                    className={"th-nav-link " + (isActive("/contact") ? "th-nav-link-active" : "")}
                     onClick={go("/contact")}
                 >
                     Contact Us
@@ -147,7 +143,6 @@ const Header = () => {
                         <button className="th-nav-link" onClick={goCompanyVacancies}>
                             Your Vacancies
                         </button>
-                        {/* 🔥 ДОБАВЛЕНО: Responses для компании */}
                         <button className="th-nav-link" onClick={goCompanyResponses}>
                             Responses
                         </button>
@@ -163,6 +158,16 @@ const Header = () => {
                             Responses
                         </button>
                     </>
+                )}
+
+                {/* ✅ ТОЛЬКО ДЛЯ ADMIN: одна кнопка Analytics */}
+                {isAdmin && (
+                    <button
+                        className={"th-nav-link " + (isActive("/admin/analytics") ? "th-nav-link-active" : "")}
+                        onClick={goAnalytics}
+                    >
+                        Analytics
+                    </button>
                 )}
             </nav>
 
@@ -188,16 +193,10 @@ const Header = () => {
                     </>
                 ) : (
                     <>
-                        <button
-                            className="th-nav-link th-login-btn"
-                            onClick={go("/login")}
-                        >
+                        <button className="th-nav-link th-login-btn" onClick={go("/login")}>
                             Login
                         </button>
-                        <button
-                            className="th-primary-btn"
-                            onClick={go("/register")}
-                        >
+                        <button className="th-primary-btn" onClick={go("/register")}>
                             Register
                         </button>
                     </>

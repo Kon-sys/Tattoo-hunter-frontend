@@ -1,59 +1,58 @@
-import React, { useState } from "react";
-import Header from "../../../components/layout/Header";
-import "./EmployeePage.css";
-import { useNavigate, useLocation } from "react-router-dom";
-import { apiFetch } from "../../../api/apiClient";
+"use client"
 
-const API = "http://localhost:8080/api/profile/employee/contact-details";
+import React, { useState } from "react"
+import Header from "../../../components/layout/Header"
+import Footer from "../../../components/layout/Footer";
+import "./EmployeePage.css"
+import { useNavigate, useLocation } from "react-router-dom"
+
+const API = "http://localhost:8080/api/profile/employee/contact-details"
 
 const EmployeeContacts = () => {
-    const nav = useNavigate();
-    const location = useLocation();
+    const nav = useNavigate()
+    const location = useLocation()
 
-    // режим: регистрация или редактирование
-    const params = new URLSearchParams(location.search);
-    const isRegisterFlow = params.get("flow") === "register";
+    const params = new URLSearchParams(location.search)
+    const isRegisterFlow = params.get("flow") === "register"
 
-    const [phone, setPhone] = useState("");
-    const [email, setEmail] = useState("");
-    const [telegram, setTelegram] = useState("");
+    const [phone, setPhone] = useState("")
+    const [email, setEmail] = useState("")
+    const [telegram, setTelegram] = useState("")
 
-    const [error, setError] = useState("");
+    const [error, setError] = useState("")
 
     const save = async (e) => {
-        e.preventDefault();
-        setError("");
+        e.preventDefault()
+        setError("")
 
         if (!phone || !email) {
-            setError("Введите телефон и email");
-            return;
+            setError("Введите телефон и email")
+            return
         }
 
-        const token = localStorage.getItem("token");
-        const fd = new FormData();
-        fd.append("phone", phone);
-        fd.append("email", email);
-        fd.append("telegram", telegram);
+        const token = localStorage.getItem("token")
+        const fd = new FormData()
+        fd.append("phone", phone)
+        fd.append("email", email)
+        fd.append("telegram", telegram)
 
         const res = await fetch(API, {
             method: "POST",
             headers: { Authorization: `Bearer ${token}` },
-            body: fd
-        });
+            body: fd,
+        })
 
         if (!res.ok) {
-            setError("Ошибка сохранения");
-            return;
+            setError("Ошибка сохранения")
+            return
         }
 
         if (isRegisterFlow) {
-            // продолжаем воронку регистрации
-            nav("/profile/employee/additional?flow=register");
+            nav("/profile/employee/additional?flow=register")
         } else {
-            // редактирование из профиля → назад в профиль
-            nav("/profile");
+            nav("/profile")
         }
-    };
+    }
 
     return (
         <div className="emp-page">
@@ -65,15 +64,16 @@ const EmployeeContacts = () => {
                     <h1 className="emp-title">CONTACTS</h1>
 
                     <form className="emp-form" onSubmit={save}>
+                        <input className="emp-input" placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
 
-                        <input className="emp-input" placeholder="Phone"
-                               value={phone} onChange={e=>setPhone(e.target.value)} />
+                        <input className="emp-input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-                        <input className="emp-input" placeholder="Email"
-                               value={email} onChange={e=>setEmail(e.target.value)} />
-
-                        <input className="emp-input" placeholder="Telegram"
-                               value={telegram} onChange={e=>setTelegram(e.target.value)} />
+                        <input
+                            className="emp-input"
+                            placeholder="Telegram"
+                            value={telegram}
+                            onChange={(e) => setTelegram(e.target.value)}
+                        />
 
                         {error && <div className="emp-error">{error}</div>}
 
@@ -81,8 +81,9 @@ const EmployeeContacts = () => {
                     </form>
                 </section>
             </div>
+            <Footer />
         </div>
-    );
-};
+    )
+}
 
-export default EmployeeContacts;
+export default EmployeeContacts

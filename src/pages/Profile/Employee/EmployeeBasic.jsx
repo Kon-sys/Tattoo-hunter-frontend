@@ -1,71 +1,70 @@
-import React, { useState } from "react";
-import "./EmployeePage.css";
-import Header from "../../../components/layout/Header";
-import { useNavigate, useLocation } from "react-router-dom";
-import { apiFetch } from "../../../api/apiClient";
+"use client"
+
+import React, { useState } from "react"
+import "./EmployeePage.css"
+import Header from "../../../components/layout/Header"
+import Footer from "../../../components/layout/Footer";
+import { useNavigate, useLocation } from "react-router-dom"
+import { apiFetch } from "../../../api/apiClient"
 
 const EmployeeBasic = () => {
-    const nav = useNavigate();
-    const location = useLocation();
+    const nav = useNavigate()
+    const location = useLocation()
 
-    // режим: регистрация или редактирование
-    const params = new URLSearchParams(location.search);
-    const isRegisterFlow = params.get("flow") === "register";
+    const params = new URLSearchParams(location.search)
+    const isRegisterFlow = params.get("flow") === "register"
 
-    const [firstName, setFN] = useState("");
-    const [lastName, setLN] = useState("");
-    const [fatherName, setFather] = useState("");
-    const [birthDate, setBD] = useState("");
-    const [gender, setGender] = useState("");
-    const [city, setCity] = useState("");
-    const [experience, setExp] = useState("");
+    const [firstName, setFN] = useState("")
+    const [lastName, setLN] = useState("")
+    const [fatherName, setFather] = useState("")
+    const [birthDate, setBD] = useState("")
+    const [gender, setGender] = useState("")
+    const [city, setCity] = useState("")
+    const [experience, setExp] = useState("")
 
-    const [error, setError] = useState("");
+    const [error, setError] = useState("")
 
     const submit = async (e) => {
-        e.preventDefault();
-        setError("");
+        e.preventDefault()
+        setError("")
 
         if (!firstName || !lastName || !gender || !birthDate) {
-            setError("Заполните обязательные поля");
-            return;
+            setError("Заполните обязательные поля")
+            return
         }
 
-        const fd = new FormData();
-        fd.append("firstName", firstName);
-        fd.append("lastName", lastName);
-        fd.append("fatherName", fatherName);
-        fd.append("birthDate", birthDate);
-        fd.append("gender", gender);
-        fd.append("city", city);
-        fd.append("experience", experience);
+        const fd = new FormData()
+        fd.append("firstName", firstName)
+        fd.append("lastName", lastName)
+        fd.append("fatherName", fatherName)
+        fd.append("birthDate", birthDate)
+        fd.append("gender", gender)
+        fd.append("city", city)
+        fd.append("experience", experience)
 
         try {
             const res = await apiFetch("/api/profile/employee", {
                 method: "POST",
-                body: fd, // без Content-Type, FormData сам
-            });
+                body: fd,
+            })
 
             if (!res.ok) {
-                const text = await res.text();
-                console.log("employee basic:", res.status, text);
-                setError(text || "Ошибка сохранения");
-                return;
+                const text = await res.text()
+                console.log("employee basic:", res.status, text)
+                setError(text || "Ошибка сохранения")
+                return
             }
 
-            // успешное сохранение
             if (isRegisterFlow) {
-                // продолжаем воронку регистрации
-                nav("/profile/employee/categories?flow=register");
+                nav("/profile/employee/categories?flow=register")
             } else {
-                // редактирование из профиля → назад в профиль
-                nav("/profile");
+                nav("/profile")
             }
         } catch (err) {
-            console.error(err);
-            setError("Ошибка подключения к серверу");
+            console.error(err)
+            setError("Ошибка подключения к серверу")
         }
-    };
+    }
 
     return (
         <div className="emp-page">
@@ -100,30 +99,16 @@ const EmployeeBasic = () => {
                         />
 
                         <div className="emp-row">
-                            <input
-                                type="date"
-                                className="emp-input"
-                                value={birthDate}
-                                onChange={(e) => setBD(e.target.value)}
-                            />
+                            <input type="date" className="emp-input" value={birthDate} onChange={(e) => setBD(e.target.value)} />
 
-                            <select
-                                className="emp-input"
-                                value={gender}
-                                onChange={(e) => setGender(e.target.value)}
-                            >
+                            <select className="emp-input" value={gender} onChange={(e) => setGender(e.target.value)}>
                                 <option value="">Gender</option>
                                 <option value="MALE">Male</option>
                                 <option value="FEMALE">Female</option>
                             </select>
                         </div>
 
-                        <input
-                            className="emp-input"
-                            placeholder="City"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                        />
+                        <input className="emp-input" placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} />
 
                         <input
                             className="emp-input"
@@ -138,8 +123,9 @@ const EmployeeBasic = () => {
                     </form>
                 </section>
             </div>
+            <Footer />
         </div>
-    );
-};
+    )
+}
 
-export default EmployeeBasic;
+export default EmployeeBasic

@@ -1,191 +1,201 @@
-// src/pages/Chat/ChatListPage.jsx
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Header from "../../components/layout/Header";
-import "../Profile/Employee/EmployeePage.css";
-import { apiFetch } from "../../api/apiClient";
+"use client"
+
+import React, { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import Header from "../../components/layout/Header"
+import "./ChatPage.css"
+import { apiFetch } from "../../api/apiClient"
+import Footer from "../../components/layout/Footer";
 
 const ChatListPage = () => {
-    const [chats, setChats] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [chats, setChats] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
+    const navigate = useNavigate()
 
-    let user = null;
+    let user = null
     try {
-        const stored = localStorage.getItem("th_user");
-        user = stored ? JSON.parse(stored) : null;
+        const stored = localStorage.getItem("th_user")
+        user = stored ? JSON.parse(stored) : null
     } catch (e) {
-        console.error("Cannot parse th_user", e);
+        console.error("Cannot parse th_user", e)
     }
 
-    const role = user?.role;
-    const login = user?.login;
+    const role = user?.role
+    const login = user?.login
 
     useEffect(() => {
-        let cancelled = false;
+        let cancelled = false
 
         const loadChats = async () => {
             if (!user) {
-                setLoading(false);
-                return;
+                setLoading(false)
+                return
             }
 
             try {
-                let res;
+                let res
 
                 if (role === "ROLE_EMPLOYEE") {
-                    // чаты работника
                     res = await apiFetch("/api/chats/employee", {
                         method: "GET",
                         headers: {
                             "X-User-Login": login,
                         },
-                    });
+                    })
                 } else if (role === "ROLE_COMPANY") {
-                    // сначала получаем вакансии компании, чтобы выдернуть companyId
                     const vacRes = await apiFetch("/api/vacancy/company", {
                         method: "GET",
                         headers: {
-                            "X_User_Login": login,
-                            "X_User_Role": role,
+                            X_User_Login: login,
+                            X_User_Role: role,
                         },
-                    });
+                    })
 
                     if (!vacRes.ok) {
-                        const txt = await vacRes.text();
-                        throw new Error(txt || "Не удалось загрузить вакансии компании");
+                        const txt = await vacRes.text()
+                        throw new Error(txt || "Не удалось загрузить вакансии компании")
                     }
 
-                    const vacancies = await vacRes.json();
+                    const vacancies = await vacRes.json()
                     if (!Array.isArray(vacancies) || vacancies.length === 0) {
-                        throw new Error("У компании нет вакансий — чатов пока нет.");
+                        throw new Error("У компании нет вакансий — чатов пока нет.")
                     }
 
-                    const companyId = vacancies[0].companyId;
+                    const companyId = vacancies[0].companyId
                     if (!companyId) {
-                        throw new Error("Не удалось определить companyId");
+                        throw new Error("Не удалось определить companyId")
                     }
 
-                    // теперь дергаем чаты для компании
-                    res = await apiFetch(
-                        `/api/chats/company?companyId=${companyId}`,
-                        {
-                            method: "GET",
-                            headers: {
-                                "X-User-Login": login,
-                            },
-                        }
-                    );
+                    res = await apiFetch(`/api/chats/company?companyId=${companyId}`, {
+                        method: "GET",
+                        headers: {
+                            "X-User-Login": login,
+                        },
+                    })
                 } else {
-                    setLoading(false);
-                    return;
+                    setLoading(false)
+                    return
                 }
 
                 if (!res.ok) {
-                    const txt = await res.text();
-                    throw new Error(txt || "Не удалось загрузить чаты");
+                    const txt = await res.text()
+                    throw new Error(txt || "Не удалось загрузить чаты")
                 }
 
-                const data = await res.json();
+                const data = await res.json()
+
                 if (!cancelled) {
-                    setChats(Array.isArray(data) ? data : []);
+                    setChats(Array.isArray(data) ? data : [])
                 }
             } catch (err) {
-                console.error(err);
+                console.error(err)
                 if (!cancelled) {
-                    setError(err.message || "Ошибка загрузки чатов");
+                    setError(err.message || "Ошибка загрузки чатов")
                 }
             } finally {
-                if (!cancelled) setLoading(false);
+                if (!cancelled) setLoading(false)
             }
-        };
+        }
 
-        loadChats();
+        loadChats()
 
         return () => {
-            cancelled = true;
-        };
-    }, [login, role]); // ЭТИ ДВЕ ЗАВИСИМОСТИ достаточно
+            cancelled = true
+        }
+    }, [login, role])
+
+    const handleProfileClick = (chatData) => {
+        if (role === "ROLE_EMPLOYEE") {
+            navigate(`/profile/employee/view/${chatData.companyId}`)
+        } else if (role === "ROLE_COMPANY") {
+            navigate(`/profile/company/view/${chatData.employeeLogin}`)
+        }
+    }
 
     if (!user) {
         return (
-            <div className="emp-page">
-                <div className="emp-bg" />
+            <div className="chat-page">
+                <div className="chat-bg" />
                 <Header />
-                <div className="emp-content">
-                    <section className="emp-card emp-card--profile">
-                        <h1 className="emp-title">CHATS</h1>
-                        <p className="emp-profile-text">
-                            Для доступа к чатам нужно войти в систему.
-                        </p>
-                    </section>
+                <div className="chat-content">
+                    <div className="chat-card">
+                        <h1 className="chat-title">МОИ ЧАТЫ</h1>
+                        <p className="chat-empty">Для доступа к чатам нужно войти в систему.</p>
+                    </div>
                 </div>
             </div>
-        );
+        )
     }
 
     return (
-        <div className="emp-page">
-            <div className="emp-bg" />
+        <div className="chat-page">
+            <div className="chat-bg" />
             <Header />
-            <div className="emp-content">
-                <section className="emp-card emp-card--profile">
-                    <h1 className="emp-title">CHATS</h1>
+            <div className="chat-content">
+                <div className="chat-card">
+                    <h1 className="chat-title">МОИ ЧАТЫ</h1>
 
-                    {loading && <p className="emp-profile-text">Загрузка...</p>}
-                    {error && <p className="emp-error">{error}</p>}
+                    {loading && <p className="chat-loading">Загрузка...</p>}
+                    {error && <p className="chat-error">{error}</p>}
 
-                    {!loading && !error && chats.length === 0 && (
-                        <p className="emp-profile-text">Чатов пока нет.</p>
-                    )}
+                    {!loading && !error && chats.length === 0 && <p className="chat-empty">Чатов пока нет.</p>}
 
-                    <div className="emp-profile-sections">
-                        {chats.map((c) => (
-                            <div
-                                key={c.id}
-                                className="emp-profile-block"
-                                style={{ marginBottom: "12px" }}
-                            >
-                                <div className="emp-profile-grid">
-                                    <div>
-                                        <div className="emp-label">ID чата</div>
-                                        <div className="emp-value">{c.id}</div>
-                                    </div>
-                                    <div>
-                                        <div className="emp-label">Вакансия</div>
-                                        <div className="emp-value">
-                                            {c.vacancyId ? `Vacancy #${c.vacancyId}` : "—"}
+                    <div className="chat-list-grid">
+                        {chats.map((c) => {
+                            const displayName =
+                                role === "ROLE_EMPLOYEE"
+                                    ? c.companyName || `Компания #${c.companyId}`
+                                    : c.employeeName || c.employeeLogin || "Соискатель"
+
+                            const vacancyLine = c.vacancyName
+                                ? `Вакансия: ${c.vacancyName}`
+                                : c.vacancyId
+                                    ? `Вакансия: #${c.vacancyId}`
+                                    : "Без вакансии"
+
+                            return (
+                                <div key={c.id} className="chat-list-item">
+                                    <div className="chat-list-header">
+                                        <div
+                                            className="chat-list-avatar"
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleProfileClick(c)
+                                            }}
+                                            title="Перейти к профилю"
+                                        >
+                                            <span>{displayName[0]?.toUpperCase() || "?"}</span>
+                                        </div>
+
+                                        <div className="chat-list-info">
+                                            <h3 className="chat-list-name">{displayName}</h3>
+                                            {c.vacancyId ? (
+                                                <Link
+                                                    to={`/vacancies/${c.vacancyId}`}
+                                                    className="chat-list-vacancy"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    {vacancyLine}
+                                                </Link>
+                                            ) : (
+                                                <p className="chat-list-vacancy">{vacancyLine}</p>
+                                            )}
                                         </div>
                                     </div>
-                                    <div>
-                                        <div className="emp-label">
-                                            {role === "ROLE_EMPLOYEE"
-                                                ? "Компания"
-                                                : "Работник"}
-                                        </div>
-                                        <div className="emp-value">
-                                            {role === "ROLE_EMPLOYEE"
-                                                ? c.companyId
-                                                : c.employeeLogin}
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div style={{ marginTop: "12px" }}>
-                                    <Link
-                                        to={`/chats/${c.id}`}
-                                        className="emp-link"
-                                    >
-                                        Открыть чат
+                                    <Link to={`/chats/${c.id}`} className="chat-list-link">
+                                        Открыть чат →
                                     </Link>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
-                </section>
+                </div>
             </div>
+            <Footer />
         </div>
-    );
-};
+    )
+}
 
-export default ChatListPage;
+export default ChatListPage

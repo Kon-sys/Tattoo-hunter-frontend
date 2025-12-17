@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
 import "../Profile/Employee/EmployeePage.css";
 import { apiFetch } from "../../api/apiClient";
 
@@ -127,6 +128,7 @@ const CompanyVacancyPhoto = () => {
                     </form>
                 </section>
             </div>
+            <Footer />
         </div>
     );
 };

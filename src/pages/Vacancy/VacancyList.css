@@ -1,0 +1,516 @@
+/* ШРИФТ */
+@import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400;500;600;700&display=swap");
+
+html,
+body,
+#root {
+    margin: 0;
+    padding: 0;
+    font-family: "Unbounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.vacancy-page {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.vacancy-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("../../assets/base_fon.png");
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.vacancy-content {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    padding: 40px 24px 40px 50px;
+    box-sizing: border-box;
+}
+
+/* КАРТОЧКА КОНТЕЙНЕР */
+.vacancy-card {
+    max-width: 1400px;
+    margin: 100px auto 60px;
+    background: rgba(217, 217, 217, 0.02);
+    backdrop-filter: blur(10px);
+    border-radius: 32px;
+    padding: 40px 48px;
+    box-sizing: border-box;
+}
+
+/* ЗАГОЛОВОК */
+.vacancy-title {
+    margin: 0 0 32px 0;
+    font-size: 36px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fff;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* БЛОК ФИЛЬТРОВ */
+.filter-container {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+}
+
+.filter-container.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 24px;
+    margin-bottom: 0;
+}
+
+.filter-container:not(.collapsed) {
+    max-height: 2000px;
+}
+
+/* Added toggle button styles */
+.filter-toggle-btn {
+    width: 100%;
+    height: 56px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #8b3a3a 0%, #5d2626 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(139, 58, 58, 0.4);
+}
+
+.filter-toggle-btn:hover {
+    background: linear-gradient(135deg, #a04444 0%, #6e2d2d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 58, 58, 0.5);
+}
+
+.filter-toggle-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.filter-toggle-btn.open svg {
+    transform: rotate(180deg);
+}
+
+/* РЯД ФИЛЬТРОВ (СЕЛЕКТЫ + ПОЛЯ ОПЫТА И ЧАСОВ) */
+.filter-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.filter-row--equal {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.filter-input,
+.filter-select {
+    flex: 1;
+    min-width: 180px;
+    height: 52px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    padding: 0 20px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.filter-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.filter-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23fff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 44px;
+}
+
+.filter-select option {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+/* Updated filter row for income and companies side by side */
+.filter-row--split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+/* КОМПАНИИ DROPDOWN */
+.companies-dropdown {
+    position: relative;
+}
+
+.companies-dropdown-label {
+    display: block;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+.companies-dropdown-button {
+    width: 100%;
+    height: 52px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    padding: 0 20px;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.companies-dropdown-button:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.companies-dropdown-button svg {
+    transition: transform 0.2s ease;
+}
+
+.companies-dropdown-button.open svg {
+    transform: rotate(180deg);
+}
+
+/* Dropdown now opens downward */
+.companies-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    padding: 8px;
+}
+
+.companies-dropdown-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.companies-dropdown-menu::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.companies-dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+}
+
+.companies-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.company-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.company-checkbox-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.company-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #8b3a3a;
+}
+
+.company-checkbox-item label {
+    flex: 1;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* ПОИСК */
+.search-section {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    align-items: stretch;
+}
+
+.search-input {
+    flex: 1;
+    height: 56px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    padding: 0 24px;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-input:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* КНОПКИ */
+.btn {
+    height: 56px;
+    padding: 0 32px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #8b3a3a 0%, #5d2626 100%);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(139, 58, 58, 0.4);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #a04444 0%, #6e2d2d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 58, 58, 0.5);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+/* СПИСОК ВАКАНСИЙ */
+.vacancy-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+.vacancy-item {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+}
+
+.vacancy-item:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.vacancy-item-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 16px 0;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+}
+
+.vacancy-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vacancy-item-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.vacancy-item-label {
+    color: rgba(255, 255, 255, 0.6);
+    min-width: 85px;
+    flex-shrink: 0;
+}
+
+.vacancy-item-value {
+    color: #fff;
+    font-weight: 500;
+    flex: 1;
+}
+
+.vacancy-item-description {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* СОСТОЯНИЯ */
+.loading,
+.error,
+.empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #fff;
+    font-size: 18px;
+}
+
+.error {
+    color: #ffb3b3;
+}
+
+/* АДАПТИВНОСТЬ */
+@media (max-width: 1024px) {
+    .vacancy-card {
+        margin: 100px 20px 40px;
+        padding: 32px 28px;
+    }
+
+    .filter-row--equal {
+        grid-template-columns: 1fr;
+    }
+
+    /* Split layout stacks on tablets */
+    .filter-row--split {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .vacancy-content {
+        padding: 20px 16px;
+    }
+
+    .vacancy-card {
+        margin: 80px 0 30px;
+        padding: 24px 20px;
+        border-radius: 24px;
+    }
+
+    .vacancy-title {
+        font-size: 28px;
+        margin-bottom: 24px;
+    }
+
+    .filter-container {
+        padding: 20px;
+    }
+
+    .filter-row {
+        flex-direction: column;
+    }
+
+    .search-section {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .filter-actions {
+        flex-direction: column;
+    }
+
+    .vacancy-list {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-row--split {
+        grid-template-columns: 1fr;
+    }
+}

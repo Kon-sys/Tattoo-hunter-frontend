@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
 import "../Profile/Employee/EmployeePage.css";
 import { apiFetch } from "../../api/apiClient";
 
@@ -344,6 +345,7 @@ const VacancyDetailsPage = () => {
                     </div>
                 </section>
             </div>
+            <Footer />
         </div>
     );
 };

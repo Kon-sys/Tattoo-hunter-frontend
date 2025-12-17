@@ -23,14 +23,10 @@ const LoginPage = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    login,      // если у тебя поле называется иначе (email/username) – переименуй
-                    password,
-                }),
+                body: JSON.stringify({ login, password }),
             });
 
             if (!res.ok) {
-                // 401, 400 и т.п.
                 setError("Неверный логин или пароль");
                 setLoading(false);
                 return;
@@ -42,43 +38,32 @@ const LoginPage = () => {
             localStorage.setItem("token", data.token);
             localStorage.setItem("refreshToken", data.refreshToken);
 
-// Декодируем payload
             const payload = parseJwt(data.token);
 
-// Создаем user
             const thUser = {
                 login: payload.sub,
-                role: payload.role,     // ROLE_EMPLOYEE / ROLE_COMPANY
-                fullName: payload.sub,  // временно, пока нет настоящего имени
+                role: payload.role,
+                fullName: payload.sub,
                 email: payload.sub,
             };
 
-// Сохраняем в localStorage
             localStorage.setItem("th_user", JSON.stringify(thUser));
-
-            /**
-             * ОЧЕНЬ ВАЖНО:
-             * Тут я предполагаю, что контроллер возвращает JSON вида:
-             * {
-             *   "accessToken": "...",
-             *   "refreshToken": "...",
-             *   "role": "EMPLOYEE",
-             *   "login": "user@example.com"
-             * }
-             *
-             * Если поля называются иначе — просто поправь ключи ниже.
-             */
 
             setLoading(false);
 
-            // после успешного логина отправляем на профиль (можешь поменять на / или на роль-зависимый маршрут)
-            navigate("/");
+            // ✅ редирект по роли
+            if (payload.role === "ROLE_ADMIN") {
+                navigate("/admin/analytics");
+            } else {
+                navigate("/");
+            }
         } catch (err) {
             console.error(err);
             setError("Ошибка подключения к серверу");
             setLoading(false);
         }
     };
+
 
     return (
         <div className="login-page">

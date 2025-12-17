@@ -1,65 +1,80 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "../../../components/layout/Header";
-import "./EmployeePage.css";
-import { apiFetch } from "../../../api/apiClient";
+"use client"
+
+import React, { useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import Header from "../../../components/layout/Header"
+import "./EmployeePage.css"
+import { apiFetch } from "../../../api/apiClient"
+import Footer from "../../../components/layout/Footer";
 
 const EmployeeProfilePage = () => {
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
+    const [profile, setProfile] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
+    const navigate = useNavigate()
+    const { login: employeeLogin } = useParams() // /profile/employee/view/:login
+
+    const isViewMode = !!employeeLogin // если есть login в URL -> просмотр чужого профиля
 
     useEffect(() => {
+        let cancelled = false
+
         const loadProfile = async () => {
             try {
-                const res = await apiFetch("/api/profile/employee/me", {
-                    method: "GET",
-                });
+                setLoading(true)
+                setError("")
+
+                const url = isViewMode
+                    ? `/api/profile/company/view/${encodeURIComponent(employeeLogin)}`
+                    : "/api/profile/employee/me"
+
+                const res = await apiFetch(url, { method: "GET" })
 
                 if (!res.ok) {
-                    const text = await res.text();
-                    console.error("load profile:", res.status, text);
-                    setError(text || "Не удалось загрузить профиль");
-                    setLoading(false);
-                    return;
+                    const text = await res.text()
+                    console.error("load profile:", res.status, text)
+                    if (!cancelled) setError(text || "Не удалось загрузить профиль")
+                    return
                 }
 
-                const data = await res.json();
-                setProfile(data);
-                setLoading(false);
+                const data = await res.json()
+                if (!cancelled) setProfile(data)
             } catch (e) {
-                console.error(e);
-                setError("Ошибка подключения к серверу");
-                setLoading(false);
+                console.error(e)
+                if (!cancelled) setError("Ошибка подключения к серверу")
+            } finally {
+                if (!cancelled) setLoading(false)
             }
-        };
+        }
 
-        loadProfile();
-    }, []);
+        loadProfile()
+
+        return () => {
+            cancelled = true
+        }
+    }, [isViewMode, employeeLogin])
 
     const formatName = () => {
-        if (!profile) return "";
-        const parts = [profile.firstName, profile.lastName].filter(Boolean);
-        if (parts.length === 0) return "";
-        return parts.join(" ");
-    };
+        if (!profile) return ""
+        const parts = [profile.firstName, profile.lastName].filter(Boolean)
+        return parts.join(" ")
+    }
 
     const formatCategories = (cats) => {
-        if (!cats || !cats.length) return "Не указано";
+        if (!cats || !cats.length) return "Не указано"
         return cats
             .map((c) =>
                 c
                     .toLowerCase()
                     .replace(/_/g, " ")
-                    .replace(/\b\w/g, (ch) => ch.toUpperCase())
+                    .replace(/\b\w/g, (ch) => ch.toUpperCase()),
             )
-            .join(", ");
-    };
+            .join(", ")
+    }
 
     const onEdit = () => {
-        navigate("/profile/employee/edit");
-    };
+        navigate("/profile/employee/edit")
+    }
 
     if (loading) {
         return (
@@ -73,7 +88,7 @@ const EmployeeProfilePage = () => {
                     </section>
                 </div>
             </div>
-        );
+        )
     }
 
     if (error) {
@@ -88,7 +103,7 @@ const EmployeeProfilePage = () => {
                     </section>
                 </div>
             </div>
-        );
+        )
     }
 
     if (!profile) {
@@ -99,17 +114,15 @@ const EmployeeProfilePage = () => {
                 <div className="emp-content">
                     <section className="emp-card">
                         <h1 className="emp-title">PROFILE</h1>
-                        <p className="emp-profile-text">
-                            Профиль сотрудника не найден.
-                        </p>
+                        <p className="emp-profile-text">Профиль сотрудника не найден.</p>
                     </section>
                 </div>
             </div>
-        );
+        )
     }
 
-    const name = formatName();
-    const avatarUrl = profile.mainPhoto || null;
+    const name = formatName()
+    const avatarUrl = profile.mainPhoto || null
 
     return (
         <div className="emp-page">
@@ -121,150 +134,103 @@ const EmployeeProfilePage = () => {
                     <div className="emp-profile-header">
                         <div className="emp-profile-avatar">
                             {avatarUrl ? (
-                                <img src={avatarUrl} alt="Avatar" />
+                                <img src={avatarUrl || "/placeholder.svg"} alt="Avatar" />
                             ) : (
-                                <span>
-                                    {(profile.firstName?.[0] ||
-                                        profile.lastName?.[0] ||
-                                        "U"
-                                    ).toUpperCase()}
-                                </span>
+                                <span>{(profile.firstName?.[0] || profile.lastName?.[0] || "U").toUpperCase()}</span>
                             )}
                         </div>
 
                         <div className="emp-profile-main">
-                            <h1 className="emp-title">
-                                {name || "Без имени"}
-                            </h1>
+                            <h1 className="emp-title">{name || "Без имени"}</h1>
+                            <p className="emp-profile-text">{profile.city || "Город не указан"}</p>
                             <p className="emp-profile-text">
-                                {profile.city || "Город не указан"}
+                                Опыт: {profile.experience != null ? `${profile.experience} лет` : "не указан"}
                             </p>
-                            <p className="emp-profile-text">
-                                Опыт:{" "}
-                                {profile.experience != null
-                                    ? `${profile.experience} лет`
-                                    : "не указан"}
-                            </p>
-                            <button
-                                className="emp-btn emp-btn--small"
-                                onClick={onEdit}
-                            >
-                                Edit profile
-                            </button>
+
+                            {/* Редактирование только для своего профиля */}
+                            {!isViewMode && (
+                                <button className="emp-btn emp-btn--small" onClick={onEdit}>
+                                    Edit profile
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     <div className="emp-profile-sections">
                         <div className="emp-profile-block">
-                            <h2 className="emp-profile-subtitle">
-                                Basic info
-                            </h2>
+                            <h2 className="emp-profile-subtitle">Basic info</h2>
                             <div className="emp-profile-grid">
                                 <div>
                                     <div className="emp-label">First name</div>
-                                    <div className="emp-value">
-                                        {profile.firstName || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.firstName || "—"}</div>
                                 </div>
                                 <div>
                                     <div className="emp-label">Last name</div>
-                                    <div className="emp-value">
-                                        {profile.lastName || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.lastName || "—"}</div>
                                 </div>
                                 <div>
                                     <div className="emp-label">Father name</div>
-                                    <div className="emp-value">
-                                        {profile.fatherName || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.fatherName || "—"}</div>
                                 </div>
                                 <div>
                                     <div className="emp-label">Birth date</div>
-                                    <div className="emp-value">
-                                        {profile.birthDate || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.birthDate || "—"}</div>
                                 </div>
                                 <div>
                                     <div className="emp-label">Gender</div>
-                                    <div className="emp-value">
-                                        {profile.gender || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.gender || "—"}</div>
                                 </div>
                                 <div>
                                     <div className="emp-label">City</div>
-                                    <div className="emp-value">
-                                        {profile.city || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.city || "—"}</div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="emp-profile-block">
-                            <h2 className="emp-profile-subtitle">
-                                Contacts
-                            </h2>
+                            <h2 className="emp-profile-subtitle">Contacts</h2>
                             <div className="emp-profile-grid">
                                 <div>
                                     <div className="emp-label">Phone</div>
-                                    <div className="emp-value">
-                                        {profile.phone || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.phone || "—"}</div>
                                 </div>
                                 <div>
                                     <div className="emp-label">Email</div>
-                                    <div className="emp-value">
-                                        {profile.email || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.email || "—"}</div>
                                 </div>
                                 <div>
                                     <div className="emp-label">Telegram</div>
-                                    <div className="emp-value">
-                                        {profile.telegram || "—"}
-                                    </div>
+                                    <div className="emp-value">{profile.telegram || "—"}</div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="emp-profile-block">
-                            <h2 className="emp-profile-subtitle">
-                                Work categories
-                            </h2>
-                            <p className="emp-profile-text">
-                                {formatCategories(profile.workCategories)}
-                            </p>
+                            <h2 className="emp-profile-subtitle">Work categories</h2>
+                            <p className="emp-profile-text">{formatCategories(profile.workCategories)}</p>
                         </div>
 
                         <div className="emp-profile-block">
-                            <h2 className="emp-profile-subtitle">
-                                Additional info
-                            </h2>
-                            <p className="emp-profile-text">
-                                {profile.addInfo || "—"}
-                            </p>
+                            <h2 className="emp-profile-subtitle">Additional info</h2>
+                            <p className="emp-profile-text">{profile.addInfo || "—"}</p>
                         </div>
 
                         <div className="emp-profile-block">
                             <h2 className="emp-profile-subtitle">Resume</h2>
                             {profile.resume ? (
-                                <a
-                                    href={profile.resume}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="emp-link"
-                                >
+                                <a href={profile.resume} target="_blank" rel="noreferrer" className="emp-link">
                                     Открыть резюме
                                 </a>
                             ) : (
-                                <p className="emp-profile-text">
-                                    Резюме не загружено
-                                </p>
+                                <p className="emp-profile-text">Резюме не загружено</p>
                             )}
                         </div>
                     </div>
                 </section>
             </div>
+            <Footer />
         </div>
-    );
-};
+    )
+}
 
-export default EmployeeProfilePage;
+export default EmployeeProfilePage
